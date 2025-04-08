@@ -1,19 +1,247 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>KinoLiveStart</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="shortcut icon" href="fav/favicon-32x32.png" type="image/x-icon">
-    <link rel="stylesheet" href="css/style.css">
-  </head>
-  <body>
-      <header>
-        <h1 class="text-center text-white mt-5 fw-bold">Kino Live Start</h1>
-      </header>
 
-      <script type="module" src="js/app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-  </body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KinoLiveStart</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="shortcut icon" href="fav/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="css/style2.css">
+</head>
+
+<body class="light-theme">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">
+        <img src="logo/logo.png" alt="Kino Live Start" width="40" height="40" class="ms-3">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link text-white fw-bold" href="#home">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link text-white fw-bold" href="#tendencias">Tendencias</a></li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" id="navbarDropdown" role="button"
+              data-bs-toggle="dropdown">
+              Categorías
+            </a>
+            <ul id="dynamicCategoriesList" class="dropdown-menu"></ul>
+          </li>
+          <li class="nav-item"><a class="nav-link text-white fw-bold" href="#populares">Populares</a></li>
+          <li class="nav-item"><a class="nav-link text-white fw-bold" href="#proximamente">Próximamente</a></li>
+        </ul>
+
+        <form id="search-form" class="d-flex mx-auto"> <!-- d-none en clase 09-->
+          <input id="search-input" class="form-control me-2" type="search" placeholder="Buscar..">
+          <button id="search-btn" class="btn btn-buscar" type="submit"><i class="bi bi-search"></i></button>
+        </form>
+
+        <!-- Toggles debajo del search -->
+        <div class="d-flex align-items-center ms-3">
+          <!-- Modo oscuro -->
+          <div class="form-check form-switch text-light me-3 ms-3">
+            <input class="form-check-input" type="checkbox" id="themeSwitch">
+            <label class="form-check-label" for="themeSwitch">Modo oscuro</label>
+          </div>
+          <!-- Idioma -->
+          <div class="form-check form-switch text-light me-4">
+            <input class="form-check-input" type="checkbox" id="languageSwitch">
+            <label class="form-check-label" for="languageSwitch">
+              <span>Es</span> | <span>EN</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <!-- BANNER -->
+  <section id="banner" class="hero"> <!--para clase 9 d-none agrego -->
+    <div class="hero-container">
+      <p>Prepárate para una aventura increíble</p>
+      <button class="btn btn-danger btn-sm">Ver ahora</button>
+      <button class="btn btn-light btn-sm">Detalles</button>
+    </div>
+  </section>
+
+
+  <!-- SECCIÓN TENDENCIAS -->
+  <section id="tendencias" class="movie-slider">
+    <h1 class="slider-title ms-5 mb-3 mt-3">Tendencias</h1>
+    <div class="movies-container mx-auto w-100">
+      <!-- Películas dinámicas para tendencias -->
+      <div class="movie-card">
+        <img src="https://image.tmdb.org/t/p/original/vDdFxksDMkUJjZXd00OKJfwXKre.jpg" alt="Pelicula 1">
+        <h5>Pelicula 1</h5>
+      </div>
+      <div class="movie-card">
+        <img src="https://image.tmdb.org/t/p/original/sPauBC638fpNHj1Bl3Qto8uWO93.jpg" alt="Pelicula 2">
+        <h5>Pelicula 2</h5>
+      </div>
+      <div class="movie-card">
+        <img src="https://image.tmdb.org/t/p/original/aG50Ad3UV8cCQWpNWSHHUqgKGNB.jpg" alt="Pelicula 3">
+        <h5>Pelicula 3</h5>
+      </div>
+      <div class="movie-card">
+        <img src="https://image.tmdb.org/t/p/original/nCuSMDWhWGJAPdp9rSDIogG5X82.jpg" alt="Pelicula 4">
+        <h5>Pelicula 4</h5>
+      </div>
+      <div class="movie-card">
+        <img src="https://image.tmdb.org/t/p/original/pb2aq76XCigCAwI7MKRPPXvdIUI.jpg" alt="Pelicula 5">
+        <h5>Pelicula 5</h5>
+      </div>
+      <div class="movie-card">
+        <img src="https://image.tmdb.org/t/p/original/dZR98C2Tzefugivw21yEfYvp1G9.jpg" alt="Pelicula 6">
+        <h5>Pelicula 6</h5>
+      </div>
+    </div>
+    <div class="button-container">
+      <button id="show-more-tendencias" class="btn btn-polish-red">Ver más</button>
+    </div>
+  </section>
+  <!--Grid Oculto-->
+  <section id="grid-tendencias" class="d-none">
+    <div class="d-flex justify-content-between align-items-center mb-3 w-100">
+      <h1 class="grid-tendencias-title mb-3 mt-3 text-center flex-grow-1">Peliculas en Tendencia</h1>
+      <button id="show-less-tendencias" class="btn btn-polish-white ms-3">Volver</button>
+    </div>
+    <div class="movies-container mx-auto w-75">
+      <!-- Aquí se generarán las 20 películas dinámicamente -->
+    </div>
+  </section>
+
+
+
+  <!-- SECCIÓN POPULARES -->
+  <section id="populares" class="movie-slider">
+    <h1 class="slider-title ms-5 mb-3 mt-3">Populares</h1>
+    <div class="movies-container mx-auto w-100">
+      <!-- Películas dinámicas para populares -->
+      <div class="movie-card">
+        <img src="https://image.tmdb.org/t/p/original/dp2ljBKcOQMVtf9Y97W1o886NaZ.jpg" alt="Pelicula 1">
+        <h5>Pelicula 1</h5>
+      </div>
+      <div class="movie-card">
+        <img src="https://image.tmdb.org/t/p/original/sDwfb63S7bNkKrmOpOcNWJItLVF.jpg" alt="Pelicula 2">
+        <h5>Pelicula 2</h5>
+      </div>
+      <div class="movie-card">
+        <img src="https://image.tmdb.org/t/p/original/yOeuJdwag4bAlnvgrdweRoiuXGC.jpg" alt="Pelicula 3">
+        <h5>Pelicula 3</h5>
+      </div>
+      <div class="movie-card">
+        <img src="https://image.tmdb.org/t/p/original/337MqZW7xii2evUDVeaWXAtopff.jpg" alt="Pelicula 4">
+        <h5>Pelicula 4</h5>
+      </div>
+      <div class="movie-card">
+        <img src="https://image.tmdb.org/t/p/original/ovAabsfjeV376QQ7828n3bLA424.jpg" alt="Pelicula 5">
+        <h5>Pelicula 5</h5>
+      </div>
+      <div class="movie-card">
+        <img src="https://image.tmdb.org/t/p/original/zayAddI9yPOTi34x9M21ezei9JV.jpg" alt="Pelicula 6">
+        <h5>Pelicula 6</h5>
+      </div>
+    </div>
+    <div class="button-container">
+      <button id="show-more-populares" class="btn btn-polish-red">Ver más</button>
+    </div>
+  </section>
+  <!-- GRID OCULTO PARA POPULARES -->
+  <section id="grid-populares" class="d-none">
+    <div class="d-flex justify-content-between align-items-center mb-3 w-100">
+      <h1 class="grid-populares-title mb-3 mt-3 text-center flex-grow-1">Peliculas Populares</h1>
+      <button id="show-less-populares" class="btn btn-polish-white ms-3">Volver</button>
+    </div>
+    <div class="movies-container mx-auto w-75">
+      <!-- Aquí se generarán las 20 películas dinámicamente -->
+    </div>
+  </section>
+
+  <!-- SECCIÓN PRÓXIMAMENTE -->
+  <section id="proximamente" class="movie-slider">
+    <h1 class="slider-title ms-5 mb-3 mt-3">Próximamente</h1>
+    <div class="movies-container mx-auto w-100">
+      <!-- Películas dinámicas para próximamente -->
+      <div class="movie-card">
+        <img src="https://image.tmdb.org/t/p/original/mI6iqk6a1MOIfYfIMQcTDDGEl8h.jpg" alt="Pelicula 1">
+        <h5>Pelicula 1</h5>
+      </div>
+      <div class="movie-card">
+        <img src="https://image.tmdb.org/t/p/original/ou9BobDOvNbkFYBTlpa7x8pND4i.jpg" alt="Pelicula 2">
+        <h5>Pelicula 2</h5>
+      </div>
+      <div class="movie-card">
+        <img src="https://image.tmdb.org/t/p/original/r2PGzaGA7bgcuy6PX7nx0BfDYsK.jpg" alt="Pelicula 3">
+        <h5>Pelicula 3</h5>
+      </div>
+      <div class="movie-card">
+        <img src="https://image.tmdb.org/t/p/original/dI5eWAvq68mddW6JkRodywrOBF.jpg" alt="Pelicula 4">
+        <h5>Pelicula 4</h5>
+      </div>
+      <div class="movie-card">
+        <img src="https://image.tmdb.org/t/p/original/A1qCKrySc4XmXOQAI6Pn5xhGdg4.jpg" alt="Pelicula 5">
+        <h5>Pelicula 5</h5>
+      </div>
+      <div class="movie-card">
+        <img src="https://image.tmdb.org/t/p/original/cxttOyp3kVIuR86bUOLOcfkYpYN.jpg" atl="Pelicula 6">
+        <h5>Pelicula 6</h5>
+      </div>
+    </div>
+    <div class="button-container">
+      <button id="show-more-proximamente" class="btn btn-polish-red">Ver más</button>
+    </div>
+  </section>
+  <!-- GRID OCULTO PARA PRÓXIMAMENTE -->
+  <section id="grid-proximamente" class="d-none">
+    <div class="d-flex justify-content-between align-items-center mb-3 w-100">
+      <h1 class="grid-proximamente-title mb-3 mt-3 text-center flex-grow-1">Próximas películas</h1>
+      <button id="show-less-proximamente" class="btn btn-polish-white ms-3">Volver</button>
+    </div>
+    <div class="movies-container mx-auto w-75">
+      <!-- Aquí se generarán las 20 películas dinámicamente -->
+    </div>
+  </section>
+
+  <!-- Sección de Categorías (GRID DINÁMICO) -->
+  <section id="category-grid-container" class="d-none">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="slider-title ms-5 mb-3 mt-3" id="dynamic-title">Películas por categoría</h1>
+      <!-- Título más descriptivo -->
+      <button id="show-less-category-grid" class="btn btn-polish-white">Volver</button>
+    </div>
+    <div class="movies-container mx-auto w-75">
+      <!-- Aquí se generarán las 20 películas dinámicas por categoría -->
+    </div>
+  </section>
+
+  <footer class="bg-dark text-light py-4">
+    <div class="container text-center">
+      <p>© 2025 Kino Live Start. Todos los derechos reservados.</p>
+      <ul class="list-inline">
+        <li class="list-inline-item"><a href="#" class="text-light text-decoration-none">Política de privacidad</a></li>
+        <li class="list-inline-item"><a href="#" class="text-light text-decoration-none">Reglamento</a></li>
+        <li class="list-inline-item"><a href="#" class="text-light text-decoration-none">Contacto</a></li>
+      </ul>
+      <div>
+        <a href="#" class="text-light me-3"><i class="fab fa-facebook fa-lg"></i></a>
+        <a href="#" class="text-light me-3"><i class="fab fa-twitter fa-lg"></i></a>
+        <a href="#" class="text-light me-3"><i class="fab fa-youtube fa-lg"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/prueba3.js"></script>
+  <script src="js/funcionalidades.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+</body>
+
 </html>

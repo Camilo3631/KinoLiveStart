@@ -75,6 +75,7 @@
     display: inline-block;
     width: 200px;
     flex: 0 0 auto;
+    background: #222;
     color: white;
     border-radius: 10px;
     overflow: hidden;
@@ -105,7 +106,7 @@
 }
 
 /* Estilo claro */
-.light-theme {
+.ligth-theme {
     background-color: #d9d9d9;
     color: #000;
 }
@@ -151,6 +152,7 @@
 }
 
 
+
 .btn {
     padding: 5px 15px; /* Reduce el tamaño */
     font-size: 14px; /* Fuente más pequeña */
@@ -190,7 +192,6 @@
 }
 
 
-
 #grid-tendencias .movies-container {
     width: 75%;  /* Cambia a 75% o 70% según lo desees */
     margin: 0 auto;  /* Centrado horizontal */
@@ -200,134 +201,6 @@
     padding-top: 20px;
   }
   
-  .movie-card {
-    color: white;
-    border-radius: 10px;
-    overflow: hidden;
-    text-align: center;
-    padding: 10px;
-    transition: transform 0.3s ease-in-out;
-  }
-  
-  .movie-card img {
-    width: 100%;
-    height: 250px;
-    object-fit: cover;
-  }
-  
-  .movie-card h5 {
-    margin-top: 10px;
-  }
-  
-  #grid-container {
-    padding: 20px 0;  /* Espaciado superior e inferior */
-  }
-  
-
-  #grid-container .d-flex {
-    padding: 0 15px;  /* Agrega margen en los lados del contenedor */
-  }
-  
-  #show-less-grid {
-    margin-left: auto; /* Lo aleja a la derecha */
-    margin-right: 15px; /* Espacio desde el borde derecho */
-  }
-
-
-  .movie-card h5 {
-    margin-top: 10px;
-    
-  }
-
-.btn-buscar {
-    height: 32px; /* Igual altura que el input */
-    padding: 4px 12px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Estilos para la cabecera de la sección */
-.section-header {
-    position: sticky;
-    top: 0;  /* Pegado a la parte superior de la sección */
-    color: white;
-    text-align: center;
-    padding: 10px 0;
-    z-index: 10; /* Asegurarse de que el título esté por encima de otros elementos */
-}
-
-/* Espaciado alrededor del título y el botón */
-.slider-title {
-    margin: 0;
-    font-size: 2rem;
-}
-
-.button-container {
-    margin-top: 15px;
-}
-
-/* Contenedor de las películas (que se mueve horizontalmente) */
-.movies-container {
-    display: flex;
-    overflow-x: auto;
-    gap: 15px;
-    padding: 10px 0;
-}
-
-/* Estilos para cada tarjeta de película */
-.movie-card {
-    min-width: 200px; /* Para mantener un tamaño consistente */
-    padding: 10px;
-    text-align: center;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.movie-card img {
-    width: 100%;
-    height: auto;
-    border-radius: 4px;
-}
-
-.movie-card h5 {
-    margin-top: 10px;
-}
-
-#dynamic-title {
-    text-align: center;
-    width: 100%;
-}
-
-
-/* Estilos para el tema oscuro */
-.dark-theme  h5 {
-    color: white;
-}
-
-/* Estilos para el tema claro */
-.light-theme h5 {
-    color: black;
-}
-
-
-.grid-card-movies {
-    width: 180px;
-    text-align: center;
-  }
-  .grid-card-movies img {
-    width: 100%;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  }
-  
-
-  .d-none {
-    display: none !important;
-  }
-  
-
   .movie-card {
     background: #222;
     color: white;
@@ -346,10 +219,71 @@
   
   .movie-card h5 {
     margin-top: 10px;
-  
   }
   
- 
+  #grid-tendencias {
+    padding: 20px 0;  /* Espaciado superior e inferior */
+  }
+  
+
+  #grid-tendencias .d-flex {
+    padding: 0 15px;  /* Agrega margen en los lados del contenedor */
+  }
+  
+  #show-less-tendencias {
+    margin-left: auto; /* Lo aleja a la derecha */
+    margin-right: 15px; /* Espacio desde el borde derecho */
+  }
+
+
+  #grid-populares .movies-container {
+    width: 75%;  /* Cambia a 75% o 70% según lo desees */
+    margin: 0 auto;  /* Centrado horizontal */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columnas */
+    gap: 20px;  /* Espacio entre las cartas */
+    padding-top: 20px;
+  }
+
+  #grid-populares {
+    padding: 20px 0;  /* Espaciado superior e inferior */
+  }
+  
+
+  #grid-populares .d-flex {
+    padding: 0 15px;  /* Agrega margen en los lados del contenedor */
+  }
+  
+  #show-less-populares {
+    margin-left: auto; /* Lo aleja a la derecha */
+    margin-right: 15px; /* Espacio desde el borde derecho */
+  }
+
+
+  #grid-proximamente .movies-container {
+    width: 75%;  /* Cambia a 75% o 70% según lo desees */
+    margin: 0 auto;  /* Centrado horizontal */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columnas */
+    gap: 20px;  /* Espacio entre las cartas */
+    padding-top: 20px;
+  }
+
+  #grid-proximanete {
+    padding: 20px 0;  /* Espaciado superior e inferior */
+  }
+  
+
+  #grid-proximamente .d-flex {
+    padding: 0 15px;  /* Agrega margen en los lados del contenedor */
+  }
+  
+  #show-less-proximamente {
+    margin-left: auto; /* Lo aleja a la derecha */
+    margin-right: 15px; /* Espacio desde el borde derecho */
+  }
+
+
 
 .btn-buscar {
     height: 32px; /* Igual altura que el input */
@@ -375,8 +309,6 @@
     margin: 0;
     font-size: 2rem;
 }
-
-
 
 .button-container {
     margin-top: 15px;
@@ -408,6 +340,8 @@
 .movie-card h5 {
     margin-top: 10px;
 }
+
+
 
 
 
