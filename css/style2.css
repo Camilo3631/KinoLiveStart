@@ -1,4 +1,8 @@
-
+body {
+    font-family: "Zilla Slab", serif;
+    font-weight: 300;
+    font-style: normal;
+}
 
 .btn-buscar {
     background-color: #d32d2f !important;
