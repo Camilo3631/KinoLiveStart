@@ -16,8 +16,18 @@ body {
 .btn-buscar:active {
    background-color: #d71c1f !important;
 }
+h4 {
+    padding-top: 10px;
+    font-size: 0.85rem !important;
+ }
 
+h5 {
+    font-size: 0.85rem;
+}
 
+.gird-tendecias h1 {
+   font-family: "Zilla Slab", serif;
+}
 /* Baner */
 
 /* Baner */
@@ -345,7 +355,99 @@ body {
     margin-top: 10px;
 }
 
+#dynamicCategoriesList {
+    position: absolute;
+    visibility: hidden;
+    opacity: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap; /* 👈 evita que se bajen */
+    gap: 5px;
+    padding: 3px;
+    list-style: none;
+    justify-content: flex-start; /* Opcional: puedes usar center si prefieres */
+    align-items: center;
+    width: 90vw;
+    max-width: 1400px;
+    border: none;
+    background: none;
+    overflow-x: auto; /* 👈 permite scroll horizontal */
+    white-space: nowrap; /* 👈 extra seguridad para fila */
+    left: 60%;
+    top: 100%;
+    transform: translateX(-8%);
+    margin-top: 10px;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    scrollbar-width: none; /* Oculta scrollbar en Firefox */
+}
 
+/* Ocultar scrollbar en Webkit (Chrome, Safari) */
+#dynamicCategoriesList::-webkit-scrollbar {
+    display: none;
+}
 
+#dynamicCategoriesList.show-menu {
+    visibility: visible;
+    opacity: 1;
+}
 
+.category-item {
+    flex: 0 0 auto; /* 👈 no se expande ni se encoge */
+    max-width: none;
+}
 
+.category-item a {
+    display: block;
+    padding: 3px 6px;
+    font-size: 10px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 3px;
+    white-space: nowrap;
+    text-align: center;
+    border: none;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.category-item a:hover {
+    background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+    #dynamicCategoriesList {
+        width: 100vw;
+    }
+
+    .category-item {
+        /* Sigue fila, solo espacio más pequeño */
+        flex: 0 0 auto;
+    }
+}
+
+/* Título */
+#dynamic-title {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    font-size: 2rem;
+}
+
+/* Títulos en tarjetas */
+.movie-card h5 {
+    margin-top: 10px;
+    font-size: 1rem;
+    text-align: center;
+    transition: color 0.3s ease-in-out;
+}
+
+.light-theme .movie-card h5 {
+    color: black;
+}
+
+.dark-theme .movie-card h5 {
+    color: white;
+}
