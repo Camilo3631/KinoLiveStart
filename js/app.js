@@ -56,10 +56,6 @@ const getTredingMovies = async () => {
 
 };
 
-// Invocamos la función asíncrona para peliculas en tendencia
-getTredingMovies();
-
-
 // Función asíncrona para mostrar las categorias de las peliculas
 const getCategoriesPreview = async () => {
 
@@ -129,7 +125,7 @@ document.addEventListener('click', (event) => {
     }
 });
 
-getCategoriesPreview();
+
 
 
 
