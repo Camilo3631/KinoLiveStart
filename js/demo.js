@@ -1,3 +1,16 @@
+// Creamos una istancia de axios
+const Api = axios.create({
+   // BaseURL
+   baseURL : 'https://api.themoviedb.org/3/',
+   // api_key como párametro
+   params: {
+    'api_key':  '030eada77e494e280d243a5356401f1a',
+   },
+   Headers: {
+     'Content-Type': 'application/json; charset=utf-8',
+   }
+});
+
 const movieDetailSection = document.getElementById('movieDetail');
 const movieBackground = document.getElementById('movie-background');
 const moviePoster = document.getElementById('movie-poster');
@@ -44,23 +57,26 @@ document.addEventListener('click', async function (e) {
     }
 
     // Buscar ID de la película por nombre
-    const searchUrl = `https://api.themoviedb.org/3/search/movie?api_key=030eada77e494e280d243a5356401f1a&query=${encodeURIComponent(movieTitleText)}&language=es`;
     try {
-      const searchRes = await fetch(searchUrl);
-      const searchData = await searchRes.json();
-
-      if (searchData.results && searchData.results.length > 0) {
-        const movie = searchData.results[0];
-        showMovieDetail(movie);
+      const searchRes = await Api.get('search/movie', {
+        params: {
+          query: movieTitleText,
+          language: 'es'
+        }
+      })
+       
+      if (searchRes.data.results && searchRes.data.results.length > 0) {
+          const movie = searchRes.data.results[0]
+          showMovieDetail(movie);
       } else {
         console.warn('No se encontró la película en la búsqueda.');
       }
-    } catch (err) {
-      console.error('Error al buscar la película:', err);
+      } catch (error) {
+        console.error('Error al buscar la película:', error);
     }
   }
 });
-
+  
 // Función para mostrar detalles
 async function showMovieDetail(movie) {
   // Ocultar secciones principales
@@ -119,16 +135,13 @@ async function fetchGenresAndSimilar(movieId) {
   similaresContainer.innerHTML = '';
 
   try {
-    const detailUrl = `https://api.themoviedb.org/3/movie/${movieId}?api_key=030eada77e494e280d243a5356401f1a&language=es`;
-    const similarUrl = `https://api.themoviedb.org/3/movie/${movieId}/similar?api_key=030eada77e494e280d243a5356401f1a&language=es`;
-
     const [detailRes, similarRes] = await Promise.all([
-      fetch(detailUrl),
-      fetch(similarUrl)
+      Api.get(`movie/${movieId}`, { params: { language: 'es' } }),
+      Api.get(`movie/${movieId}/similar`, { params: { language: 'es' } })
     ]);
 
-    const detailData = await detailRes.json();
-    const similarData = await similarRes.json();
+    const detailData = detailRes.data;
+    const similarData = similarRes.data;
 
     // Mostrar categorías
     if (detailData.genres && detailData.genres.length > 0) {
@@ -218,8 +231,6 @@ const ocultarGridTendencias = () => {
 
 // Función para generar el grid de películas
 const generarGridMoviesTendencias = () => {
-  const apiUrlEs = 'https://api.themoviedb.org/3/trending/movie/week?api_key=030eada77e494e280d243a5356401f1a&language=es';
-  const apiUrlEn = 'https://api.themoviedb.org/3/trending/movie/week?api_key=030eada77e494e280d243a5356401f1a&language=en-US';
 
   // Acción al hacer clic en "Ver más" para mostrar el grid
   showMoreTendenciasButton.addEventListener('click', async function () {
@@ -231,38 +242,35 @@ const generarGridMoviesTendencias = () => {
     moviesContainer.innerHTML = ''; // Limpiar cualquier contenido anterior
 
     try {
-      let response = await fetch(apiUrlEs);
-      let data = await response.json();
-
+      let response = await Api.get('trending/movie/week', { params: { language: 'es' } });
+      
       // Si no se obtienen resultados en español, intentamos obtenerlos en inglés
-      if (!data.results || data.results.length === 0) {
-        response = await fetch(apiUrlEn);
-        data = await response.json();
+      if (!response.data.results || response.data.results.length === 0) {
+        response = await Api.get('trending/movie/week', { params: { language: 'en-US' } });
       }
 
       // Verificamos si la respuesta contiene películas
-      if (data.results && data.results.length > 0) {
-        data.results.slice(0, 20).forEach(movie => {
+      if (response.data.results && response.data.results.length > 0) {
+        response.data.results.slice(0, 20).forEach(movie => {
           const movieCard = document.createElement('div');
           movieCard.classList.add('movie-card'); // Aplicamos la clase movie-card-grid
           movieCard.innerHTML = `
             <img src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
-            <h4>${movie.title}</h4>
+            <h5>${movie.title}</h5>
           `;
           moviesContainer.appendChild(movieCard);
         });
+      } else {
+        console.warn('No se encontraron películas para mostrar.');
       }
     } catch (error) {
-      console.error('Error al obtener las películas:', error);
+      console.error('Error al obtener películas de la API de tendencias:', error);
     }
   });
 
-  // Acción al hacer clic en "Volver" para ocultar el grid y mostrar las secciones nuevamente
-  showLessTendenciasButton.addEventListener('click', function () {
-    // Volver a mostrar las secciones
-    ocultarGridTendencias();
-  });
+  // Acción al hacer clic en "Ver menos" para ocultar el grid de tendencias
+  showLessTendenciasButton.addEventListener('click', ocultarGridTendencias);
 };
 
-// Llamamos a la función para generar el grid de películas
+// Inicializa la función de mostrar tendencias
 generarGridMoviesTendencias();
