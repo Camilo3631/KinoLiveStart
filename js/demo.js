@@ -11,20 +11,7 @@ const Api = axios.create({
    }
 });
 
-const movieDetailSection = document.getElementById('movieDetail');
-const movieBackground = document.getElementById('movie-background');
-const moviePoster = document.getElementById('movie-poster');
-const movieTitle = document.getElementById('movie-title');
-const movieDescription = document.getElementById('movie-description');
-const movieReleaseDate = document.getElementById('movie-release-date');
-const goBackButton = document.getElementById('go-back');
 
-// Secciones para mostrar y ocultar (grids y sliders)
-const bannerSection = document.getElementById('banner');
-let gridTendenciasSection = document.getElementById('grid-tendencias');
-const gridPopularessSection = document.getElementById('grid-populares');
-const gridProximamenteSection = document.getElementById('grid-proximamente');
-const movieSliders = document.querySelectorAll('.movie-slider');
 
 // Variable para recordar qué sección estaba visible antes de ver los detalles
 let visibleSectionBeforeDetail = null;
@@ -190,12 +177,7 @@ async function fetchGenresAndSimilar(movieId) {
 }
 
 
-// Obtén las secciones y botones de manera global
-let showMoreTendenciasButton = document.getElementById('show-more-tendencias');
-let showLessTendenciasButton = document.getElementById('show-less-tendencias');
-let popularesSection = document.getElementById('populares');
-let proximamenteSection = document.getElementById('proximamente');
-let categoryGridSection = document.getElementById('category-grid-container');
+
 
 // Función para mostrar el grid de tendencias y ocultar las demás secciones
 const mostrarGridTendencias = () => {
@@ -236,6 +218,7 @@ const generarGridMoviesTendencias = () => {
   showMoreTendenciasButton.addEventListener('click', async function () {
     // Mostrar el grid de tendencias
     mostrarGridTendencias();
+    
 
     // Limpiamos el contenedor antes de llenarlo
     const moviesContainer = gridTendenciasSection.querySelector('.movies-container');
@@ -273,4 +256,72 @@ const generarGridMoviesTendencias = () => {
 };
 
 // Inicializa la función de mostrar tendencias
-generarGridMoviesTendencias();
+
+
+
+const generarGridCategoryMovies = () => {
+  const categoryGridSection = [
+    { titulo: 'Pelicula 1', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_1.jpg', enlace: 'https://www.ejemplo.com/pelicula1' },
+    { titulo: 'Pelicula 2', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_2.jpg', enlace: 'https://www.ejemplo.com/pelicula2' },
+    { titulo: 'Pelicula 3', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_3.jpg', enlace: 'https://www.ejemplo.com/pelicula3' },
+    { titulo: 'Pelicula 4', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_4.jpg', enlace: 'https://www.ejemplo.com/pelicula4' },
+    { titulo: 'Pelicula 5', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_5.jpg', enlace: 'https://www.ejemplo.com/pelicula5' },
+    { titulo: 'Pelicula 6', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_6.jpg', enlace: 'https://www.ejemplo.com/pelicula6' },
+    { titulo: 'Pelicula 7', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_7.jpg', enlace: 'https://www.ejemplo.com/pelicula7' },
+    { titulo: 'Pelicula 8', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_8.jpg', enlace: 'https://www.ejemplo.com/pelicula8' },
+    { titulo: 'Pelicula 9', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_9.jpg', enlace: 'https://www.ejemplo.com/pelicula9' },
+    { titulo: 'Pelicula 10', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_10.jpg', enlace: 'https://www.ejemplo.com/pelicula10' },
+    { titulo: 'Pelicula 11', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_11.jpg', enlace: 'https://www.ejemplo.com/pelicula11' },
+    { titulo: 'Pelicula 12', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_12.jpg', enlace: 'https://www.ejemplo.com/pelicula12' },
+    { titulo: 'Pelicula 13', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_13.jpg', enlace: 'https://www.ejemplo.com/pelicula13' },
+    { titulo: 'Pelicula 14', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_14.jpg', enlace: 'https://www.ejemplo.com/pelicula14' },
+    { titulo: 'Pelicula 15', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_15.jpg', enlace: 'https://www.ejemplo.com/pelicula15' },
+    { titulo: 'Pelicula 16', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_16.jpg', enlace: 'https://www.ejemplo.com/pelicula16' },
+    { titulo: 'Pelicula 17', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_17.jpg', enlace: 'https://www.ejemplo.com/pelicula17' },
+    { titulo: 'Pelicula 18', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_18.jpg', enlace: 'https://www.ejemplo.com/pelicula18' },
+    { titulo: 'Pelicula 19', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_19.jpg', enlace: 'https://www.ejemplo.com/pelicula19' },
+    { titulo: 'Pelicula 20', imagen: 'https://image.tmdb.org/t/p/original/sample_movie_20.jpg', enlace: 'https://www.ejemplo.com/pelicula20' },
+  ];
+
+  // Ocultar secciones
+  bannerSection.classList.add('d-none');
+  popularesSection.classList.add('d-none');
+  tendenciasSection.classList.add('d-none');
+  proximamenteSection.classList.add('d-none');
+  movieSliders.forEach(slider => slider.classList.add('d-none'));
+
+  // Mostrar grid de categorías
+  const categoryGridSectionElem = document.getElementById('category-grid-container');
+  categoryGridSectionElem.classList.remove('d-none');
+
+  const moviesContainer = categoryGridSectionElem.querySelector('.movies-container');
+  moviesContainer.innerHTML = ''; // Limpiar el contenedor antes de agregar nuevas películas
+
+  // Agregar las películas al grid
+  categoryGridSection.forEach(movie => {
+    const movieCard = document.createElement('div');
+    movieCard.classList.add('movie-card');
+    movieCard.innerHTML = `
+      <img src="${movie.imagen}" alt="${movie.titulo}">
+      <h5>${movie.titulo}</h5>
+      <a href="${movie.enlace}" target="_blank">Ver más</a>
+    `;
+    moviesContainer.appendChild(movieCard);
+  });
+
+  // Botón para volver
+  const showLessCategoryGridButton = document.getElementById('show-less-category-grid');
+  showLessCategoryGridButton.classList.remove('d-none');
+
+  showLessCategoryGridButton.addEventListener('click', function () {
+    // Volver a mostrar las secciones originales
+    bannerSection.classList.remove('d-none');
+    popularesSection.classList.remove('d-none');
+    proximamenteSection.classList.remove('d-none');
+    categoryGridSectionElem.classList.add('d-none');
+    movieSliders.forEach(slider => slider.classList.remove('d-none'));
+
+    // Ocultar el botón de volver
+    showLessCategoryGridButton.classList.add('d-none');
+  });
+};
