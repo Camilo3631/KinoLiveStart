@@ -536,14 +536,57 @@ h5 {
   }
   
 
-  .dark {
-    background-color: #000080; /* Azul Marino */
-    color: white;              /* Color del texto */
-    border: none;              /* Sin borde */
-    padding: 10px 20px;        /* Espaciado interno */
-    font-size: 16px;           /* Tamaño del texto */
-    border-radius: 5px;        /* Bordes redondeados */
-    cursor: pointer;          /* Cambiar cursor a mano */
-    transition: background-color 0.3s ease; /* Transición suave */
+  #category-grid-container .movies-container {
+    width: 75%;  /* Cambia a 75% o 70% según lo desees */
+    margin: 0 auto;  /* Centrado horizontal */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columnas */
+    gap: 20px;  /* Espacio entre las cartas */
+    padding-top: 20px;
   }
   
+  .movie-card {
+    background: #222;
+    color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+    padding: 10px;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .movie-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+  }
+  
+  .movie-card h5 {
+    margin-top: 10px;
+  }
+  
+  #category-grid-container {
+    padding: 20px 0;  /* Espaciado superior e inferior */
+  }
+  
+
+  #category-grid-container .d-flex {
+    padding: 0 15px;  /* Agrega margen en los lados del contenedor */
+  }
+  
+  #show-less-category-grid {
+    margin-left: auto; /* Lo aleja a la derecha */
+    margin-right: 15px; /* Espacio desde el borde derecho */
+  }
+
+
+.dark {
+  background-color: #000080; /* Azul Marino */
+  color: white;              /* Color del texto */
+  border: none;              /* Sin borde */
+  padding: 10px 20px;        /* Espaciado interno */
+  font-size: 16px;           /* Tamaño del texto */
+  border-radius: 5px;        /* Bordes redondeados */
+  cursor: pointer;          /* Cambiar cursor a mano */
+  transition: background-color 0.3s ease; /* Transición suave */
+}
