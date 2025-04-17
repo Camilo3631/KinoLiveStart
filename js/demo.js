@@ -149,7 +149,7 @@ async function fetchGenresAndSimilar(movieId) {
       detailData.genres.forEach(genre => {
         const btn = document.createElement('button');
         btn.textContent = genre.name;
-        btn.className = 'btn btn-outline-m-1';
+        btn.className = 'btn btn-dark m-1';
         categoriesContainer.appendChild(btn);
       });
     }
