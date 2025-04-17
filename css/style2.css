@@ -578,3 +578,15 @@ h5 {
     margin-left: auto; /* Lo aleja a la derecha */
     margin-right: 15px; /* Espacio desde el borde derecho */
   }
+
+
+.dark {
+  background-color: #000080; /* Azul Marino */
+  color: white;              /* Color del texto */
+  border: none;              /* Sin borde */
+  padding: 10px 20px;        /* Espaciado interno */
+  font-size: 16px;           /* Tamaño del texto */
+  border-radius: 5px;        /* Bordes redondeados */
+  cursor: pointer;          /* Cambiar cursor a mano */
+  transition: background-color 0.3s ease; /* Transición suave */
+}

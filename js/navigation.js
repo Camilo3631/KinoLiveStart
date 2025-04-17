@@ -1,6 +1,7 @@
 searchButton.addEventListener('click', () => {
-  location.hash = '#search';
-}, { once: true });
+  location.hash = '#search=';
+
+});
 
 showMoreTendenciasButton.addEventListener('click', () => {
   location.hash = '#trends';
@@ -145,7 +146,7 @@ const movieDetailsPage = () => {
         movie.genres.forEach(genre => {
           const btn = document.createElement('button');
           btn.textContent = genre.name;
-          btn.className = 'btn btn-outline-m-1';
+          btn.className = 'btn btn-dark m-1';
           categoriesContainer.appendChild(btn);
         });
       }
@@ -200,28 +201,66 @@ const movieDetailsPage = () => {
   goBackButton.addEventListener('click', () => {
     movieDetailSection.classList.add('d-none');
 
-    
-    // Limpiar detalles de la película
+    switch (visibleSectionBeforeDetail) {
+      case 'gridTendencias':
+        gridTendenciasSection.classList.remove('d-none');
+        break;
+      case 'gridPopularess':
+        gridPopularessSection.classList.remove('d-none');
+        break;
+      case 'gridProximamente':
+        gridProximamenteSection.classList.remove('d-none');
+        break;
+      case 'sliders':
+        movieSliders.forEach(slider => slider.classList.remove('d-none'));
+        break;
+    }
+
+    resetDetailView();
+  });
+
+  // Funcionalidad del botón "Volver al home"
+  document.getElementById('go-back-home').addEventListener('click', () => {
+    movieDetailSection.classList.add('d-none');
+    bannerSection.classList.remove('d-none');
+    movieSliders.forEach(slider => slider.classList.remove('d-none'));
+
+    resetDetailView();
+  });
+
+  // Función para resetear la vista de detalles y restaurar elementos
+  const resetDetailView = () => {
+    // Limpiar la vista de detalles de la película
     moviePoster.innerHTML = '';
     movieBackground.style.backgroundImage = '';
     document.getElementById('movie-categories').innerHTML = '';
     document.getElementById('movie-similares').innerHTML = '';
 
-    // Restaurar la visibilidad del banner
-    bannerSection.classList.remove('d-none');
-    tendenciasSection.classList.remove('d-none');
-    popularesSection.classList.remove('d-none');
-    proximamenteSection.classList.remove('d-none');
-
-
     // Limpiar la variable que recuerda qué sección estaba visible
     visibleSectionBeforeDetail = null;
 
+    // Restaurar la visibilidad de las secciones principales
     getTredingMovies();
     getCategoriesPreview();
     generarGridMoviesTendencias();
-  });
+    toggleButtons(); // Revisa el estado de los botones
+  };
+
+  // Función para verificar y ocultar/mostrar botones según la sección
+  const toggleButtons = () => {
+    const isDetailPage = !movieDetailSection.classList.contains('d-none');
+
+    // Mostrar o esconder botones dependiendo de si estamos en la página de detalles
+    if (isDetailPage) {
+      document.getElementById('go-back-home').classList.add('d-none');  // Ocultar "Volver al home"
+      goBackButton.classList.remove('d-none');  // Mostrar "Volver a la sección"
+    } else {
+      document.getElementById('go-back-home').classList.remove('d-none');  // Mostrar "Volver al home"
+      goBackButton.classList.add('d-none');  // Ocultar "Volver a la sección"
+    }
+  };
 };
+
 
 
 // Generamos un arrow function para searchPage
@@ -236,14 +275,15 @@ const searchPage = () => {
  
  
    movieDetailSection.classList.add('d-none');
-   categoryGridSection.classList.add('d-none')
+   categoryGridSection.classList.add('d-none');
+   gridTendenciasSection.classList.add('d-none');
  
    // Búscador simpre visible
    searchForm.classList.remove('d-none');
 
    getTredingMovies();
    getCategoriesPreview();
-   generarGridMoviesTendencias();
+  
 };
 
 
