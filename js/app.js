@@ -175,6 +175,33 @@ const getMoviesCategory = async (id) => { // Solo recibe el id
       }
 
       // Encontrar el nombre de la categoría usando su id
+      const genereMap = {
+        28: 'Accion',
+        12: 'Aventura',
+        16: 'Animación',
+        35: 'Comedia',
+        80: 'Crimen',
+        99: 'Documental',
+        18: 'Drama',
+        10751: 'Familiar',
+        14: 'Fantasia',
+        36: 'Historia',
+        27: 'Terror',
+        10402: 'Música',
+        9648: 'Misterio',
+        10749: 'Romance',
+        878: 'Ciencia ficcion',
+        10770: 'Pelicula de tv',
+        53: 'Suspenso',
+        10752: 'Bélica',
+        37: 'Western',
+      };
+
+      const categoryTitle = document.querySelector('.grid-category-title');
+      if (genereMap[id]) {
+        categoryTitle.textContent =  `Peliculas por categoría: ${genereMap[id]}`;
+      }
+      
    
 
       

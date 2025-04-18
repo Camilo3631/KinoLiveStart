@@ -32,6 +32,8 @@ document.addEventListener('click', async function (e) {
       visibleSectionBeforeDetail = 'gridPopularess';
     } else if (!gridProximamenteSection.classList.contains('d-none')) {
       visibleSectionBeforeDetail = 'gridProximamente';
+    } else if (!categoryGridSection.classList.contains('d-none')) {
+      visibleSectionBeforeDetail = 'category-grid-container';
     } else if ([...movieSliders].some(slider => !slider.classList.contains('d-none'))) {
       visibleSectionBeforeDetail = 'sliders';
     }
@@ -46,14 +48,10 @@ document.addEventListener('click', async function (e) {
       });
 
       if (searchRes.data.results.length > 0) {
-        // Ordenar por fecha de estreno descendente
-        const resultsOrdenados = searchRes.data.results
-          .filter(movie => movie.release_date)
-          .sort((a, b) => new Date(b.release_date) - new Date(a.release_date));
-
-        const movie = resultsOrdenados[0];
+        const movie = searchRes.data.results[0];
         showMovieDetail(movie);
       }
+
     } catch (err) {
       console.error('Error al buscar la película:', err);
     }
@@ -66,6 +64,7 @@ async function showMovieDetail(movie) {
   gridTendenciasSection.classList.add('d-none');
   gridPopularessSection.classList.add('d-none');
   gridProximamenteSection.classList.add('d-none');
+  categoryGridSection.classList.add('d-none');
   movieSliders.forEach(slider => slider.classList.add('d-none'));
   bannerSection.classList.add('d-none');
 
@@ -101,6 +100,8 @@ goBackButton.addEventListener('click', () => {
     case 'gridProximamente':
       gridProximamenteSection.classList.remove('d-none');
       break;
+    case 'category-grid-container':
+      categoryGridSection.classList.remove('d-none');
   }
 
   resetDetailView();

@@ -84,7 +84,7 @@ const categoriesPage = () => {
   gridTendenciasSection.classList.add('d-none');
   getTredingMovies();
   getCategoriesPreview()
-  getMoviesCategory(id);
+  getMoviesCategory();
 };
 
 
