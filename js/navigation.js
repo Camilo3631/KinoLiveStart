@@ -71,23 +71,22 @@ const homePage = () => {
   getTredingMovies();
   generarGridMoviesTendencias();
 
+
 };
 
 // Generamos un arrow function para categoriesPage
+
 const categoriesPage = () => {
   console.log('Categories!!');
-    // Búscador simpre visible
-    searchForm.classList.remove('d-none');
-    tendenciasSection.classList.remove('d-none');
+  searchForm.classList.remove('d-none');
+  tendenciasSection.classList.add('d-none');
+  movieDetailSection.classList.add('d-none');
+  gridTendenciasSection.classList.add('d-none');
+  getTredingMovies();
+  getCategoriesPreview()
+  getMoviesCategory(id);
+};
 
-
-    movieDetailSection.classList.add('d-none');
-
-    getTredingMovies();
-    getCategoriesPreview();
-    generarGridCategoryMovies();
-    generarGridMoviesTendencias();
-}
 
 const movieDetailsPage = () => {
   console.log('Entrando a movieDetailsPage');
@@ -241,8 +240,8 @@ const movieDetailsPage = () => {
 
     // Restaurar la visibilidad de las secciones principales
     getTredingMovies();
-    getCategoriesPreview();
     generarGridMoviesTendencias();
+    generarGridCategoryMovies();
     toggleButtons(); // Revisa el estado de los botones
   };
 
@@ -284,6 +283,7 @@ const searchPage = () => {
    getTredingMovies();
    getCategoriesPreview();
   
+  
 };
 
 
@@ -297,8 +297,9 @@ const trendsPage = () => {
    proximamenteSection.classList.add('d-none');
    popularesSection.classList.add('d-none');
    getTredingMovies();
-   getCategoriesPreview();
    generarGridMoviesTendencias();
+   getCategoriesPreview();
+
 
    movieDetailSection.classList.add('d-none');
    categoryGridSection.classList.add('d-none')
