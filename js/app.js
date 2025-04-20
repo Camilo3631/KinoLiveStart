@@ -245,3 +245,103 @@ const getMoviesCategory = async (id) => { // Solo recibe el id
       console.error('Error al generar el grid de películas:', error);
     }
 };
+
+
+// Función asíncrona para el buscador
+const getMoviesSearch = async  (query) => {
+
+  try  {
+ 
+    const { data } = await api('/search/movie', {
+
+      params: {
+         query
+     },
+
+    });
+
+    const movies = data.results;
+    const container = document.querySelector('#category-grid-container .movies-container');
+    const title = document.querySelector('.grid-category-title');
+
+    // Limpiamos el conteniodo anterior
+    container.innerHTML = '';
+
+    movies.forEach(movie => {
+      if (!movie.poster_path) return;
+
+      const movieElement = document.createElement('div');
+      movieElement.classList.add('movie-card', 'mb-4');
+
+      movieElement.innerHTML = `
+        <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" class="img-fluid rounded">
+          <h5>${movie.title}</h5>
+       `;
+
+      container.appendChild(movieElement);
+
+    })
+
+    // Ocultamos el home
+    bannerSection.classList.add('d-none');
+    tendenciasSection.classList.add('d-none');
+    popularesSection.classList.add('d-none');
+    proximamenteSection.classList.add('d-none');
+
+    // Mostrar resultados
+    categoryGridSection.classList.remove('d-none');
+
+    // Cambiar el titulo del texto buscado
+    title.textContent = decodeURIComponent(query);
+
+
+  } catch (error) {
+    console.error('Error al buscar películas:', error);
+
+  }
+
+};
+
+// Botón de volver
+const volverBtn =  document.getElementById('show-less-category-grid');
+
+volverBtn.addEventListener('click', () => {
+   // Ocultar sección de resultados
+   categoryGridSection.classList.add('d-none');
+
+   // Mostrar el home
+   bannerSection.classList.remove('d-none');
+   tendenciasSection.classList.remove('d-none');
+   popularesSection.classList.remove('d-none');
+   proximamenteSection.classList.remove('d-none');
+
+   // Limpiar resultados
+   const container = document.querySelector('#category-grid-container .movies-container');
+   container.innerHTML = '';
+
+   // Restaurar título
+   const title = document.querySelector('.grid-category-title');
+   title.textContent = 'Películas por categoría';
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
