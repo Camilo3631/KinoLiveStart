@@ -591,101 +591,27 @@ h5 {
   transition: background-color 0.3s ease; /* Transición suave */
 }
 
- 
-@media (max-width: 380px) {
 
-
-  #category-grid-container .movies-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    width: 50%;
-    margin: 0 auto;
-    justify-items: center;
-    align-items: center;
-    gap: 15px;
-  }
-  
-  /* Para las tendencias */
-  #grid-tendencias .movies-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    width: 50%;
-    margin: 0 auto;
-    justify-items: center;
-    align-items: center;
-    gap: 15px;
-
-
-  }
-
-
- .movie-card img {
-    width:  80%;
-    height: 250px;
-    object-fit: cover;
-  }
-
-
-  .movie-card {
-    display: inline-block;
-    width: 120px;
-    flex: 0 0 auto;
-    background: #222;
-    color: white;
-    gap: 20px;
-    border-radius: 10px;
-    overflow: hidden;
-    text-align: center;
-    transition: transfrom 0.3s ease-in-out;
-    
-}
-
-
-#movieDetail {
-  position: relative;
-  min-height: 100vh; /* Asegura que cubra toda la pantalla */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.7); /* Fondo oscuro para la sección */
-  gap: 20px;
-}
-};
 
 
 @media (max-width: 830px) {
-
-
-  #category-grid-container .movies-container {
-    display: grid;
-    grid-template-columns:repeat(4, 1fr);
-    width: 75%;
-    margin: 0 auto;
-    justify-items: center;
-    align-items: center;
-    gap: 15px;
-  }
-  
-  /* Para las tendencias */
+  #category-grid-container .movies-container,
   #grid-tendencias .movies-container {
     display: grid;
-    grid-template-columns:repeat(4, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     width: 75%;
     margin: 0 auto;
     justify-items: center;
     align-items: center;
     gap: 15px;
-
-
+    overflow-x: hidden;
   }
 
-
- .movie-card img {
-    width:  70%;
+  .movie-card img {
+    width: 70%;
     height: 250px;
     object-fit: cover;
   }
-
 
   .movie-card {
     display: inline-block;
@@ -697,62 +623,81 @@ h5 {
     border-radius: 10px;
     overflow: hidden;
     text-align: center;
-    transition: transfrom 0.3s ease-in-out;
-}
-
-
-#movieDetail {
-  position: relative;
-  min-height: 100vh; /* Asegura que cubra toda la pantalla */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.7); /* Fondo oscuro para la sección */
-}
-
-
-
-
-
-}
-
-
-
-
-
-@media (min-width: 1180px) {
-
-
-  #category-grid-container .movies-container {
-    display: grid;
-    grid-template-columns:repeat(4, 1fr);
-    width: 100%;
-    margin: 0 auto;
-    justify-items: center;
-    align-items: center;
-    gap: 15px;
+    transition: transform 0.3s ease-in-out;
   }
-  
-  /* Para las tendencias */
+
+  #movieDetail {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+
+@media (max-width: 380px) {
+  #category-grid-container .movies-container,
   #grid-tendencias .movies-container {
     display: grid;
-    grid-template-columns:repeat(4, 1fr);
-    width: 100%;
+    grid-template-columns: 1fr;
+    width: 50%;
     margin: 0 auto;
     justify-items: center;
     align-items: center;
     gap: 15px;
-
-
+    overflow-x: hidden;
   }
 
-
- .movie-card img {
-    width:  100%;
+  .movie-card img {
+    width: 80%;
     height: 250px;
     object-fit: cover;
   }
 
+  .movie-card {
+    display: inline-block;
+    width: 120px;
+    flex: 0 0 auto;
+    background: #222;
+    color: white;
+    gap: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  #movieDetail {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    gap: 20px;
+  }
+}
+
+
+@media (min-width: 1180px) {
+  #category-grid-container .movies-container,
+  #grid-tendencias .movies-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    width: 100%;
+    margin: 0 auto;
+    justify-items: center;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .movie-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+  }
 
   .movie-card {
     display: inline-block;
@@ -764,19 +709,15 @@ h5 {
     border-radius: 10px;
     overflow: hidden;
     text-align: center;
-    transition: transfrom 0.3s ease-in-out;
-}
+    transition: transform 0.3s ease-in-out;
+  }
 
-
-#movieDetail {
-  position: relative;
-  min-height: 100vh; /* Asegura que cubra toda la pantalla */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.7); /* Fondo oscuro para la sección */
-}
-
-
-
+  #movieDetail {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+  }
 }
