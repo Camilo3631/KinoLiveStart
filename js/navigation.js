@@ -46,6 +46,10 @@ function navigator() {
 
   }
 
+  document.body.scrollTo = 0;
+    // Funcion con algunos navegadores en el caso de safari
+  document.documentElement.scrollTo = 0;
+
 };
 
 // Generamos un arrow function para homePage
