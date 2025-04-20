@@ -345,6 +345,12 @@ h5 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+ç
+
+.movie-card::after,
+.movie-card *::after {
+  content: none !important;
+}
 .movie-card img {
     width: 100%;
     height: auto;
