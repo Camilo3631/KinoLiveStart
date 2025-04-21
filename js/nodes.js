@@ -11,6 +11,7 @@ const bannerSection = document.getElementById('banner');
 const  gridTendenciasSection = document.getElementById('grid-tendencias');
 const gridPopularessSection = document.getElementById('grid-populares');
 const gridProximamenteSection = document.getElementById('grid-proximamente');
+const searchSection = document.getElementById('search-section');
 const movieSliders = document.querySelectorAll('.movie-slider');
 const movieContainer = document.querySelector('.movies-container');
 
