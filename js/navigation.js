@@ -10,9 +10,17 @@ showMoreTendenciasButton.addEventListener('click', () => {
 
 botones.forEach(boton => {
   boton.addEventListener('click', () => {
-      location.hash = '#home';
+    // Puedes cambiar el hash si deseas realizar una navegación controlada:
+    if (boton.id === 'home-btn') {
+      location.hash = '#home'; // Esto actualiza la URL con el hash de Home
+    } else if (boton.id === 'back-btn') {
+      // Si el botón es de "Volver", usamos history.back()
+      history.back();  // Esto lleva al usuario a la página anterior en el historial
+    }
   });
-})
+});
+
+
 
 // Invocamos la función y llamamos al evento
 window.addEventListener('DOMContentLoaded', navigator, false);
@@ -60,11 +68,15 @@ const homePage = () => {
   popularesSection.classList.remove('d-none');
   proximamenteSection.classList.remove('d-none');
   tendenciasSection.classList.remove('d-none');
+  searchSection.classList.add('d-none');
+
+  
   
   
 
   movieDetailSection.classList.add('d-none');
   categoryGridSection.classList.add('d-none')
+
 
   // Búscador simpre visible
   searchForm.classList.remove('d-none');
@@ -280,7 +292,6 @@ const searchPage = () => {
    movieDetailSection.classList.add('d-none');
    categoryGridSection.classList.remove('d-none');
    gridTendenciasSection.classList.add('d-none');
-   movieDetailSection.classList.add('d-none');
  
    // Búscador simpre visible
    searchForm.classList.remove('d-none');

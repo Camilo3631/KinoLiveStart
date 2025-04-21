@@ -250,6 +250,18 @@ h5 {
   }
 
 
+  #back-btn {
+    margin-left: auto; /* Lo aleja a la derecha */
+    margin-right: 30px; /* Espacio desde el borde derecho */
+  };
+
+  #home-btn  { 
+    margin-left: auto; /* Lo aleja a la derecha */
+    margin-right:30px; /* Espacio desde el borde derecho */
+
+  }
+  
+
   #grid-populares .movies-container {
     width: 75%;  /* Cambia a 75% o 70% según lo desees */
     margin: 0 auto;  /* Centrado horizontal */

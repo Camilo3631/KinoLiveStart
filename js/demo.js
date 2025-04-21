@@ -33,10 +33,12 @@ document.addEventListener('click', async function (e) {
     } else if (!gridProximamenteSection.classList.contains('d-none')) {
       visibleSectionBeforeDetail = 'gridProximamente';
     } else if (!categoryGridSection.classList.contains('d-none')) {
-      visibleSectionBeforeDetail = 'category-grid-container';
-    } else if ([...movieSliders].some(slider => !slider.classList.contains('d-none'))) {
+      visibleSectionBeforeDetail = 'category-grid-container'; 
+    } else if (!searchSection.classList.contains('d-none')) {
+       visibleSectionBeforeDetail = 'search-section';
+    }  else if ([...movieSliders].some(slider => !slider.classList.contains('d-none'))) {
       visibleSectionBeforeDetail = 'sliders';
-    }
+    };
 
     // Buscar la película y mostrar detalles
     try {
@@ -65,6 +67,7 @@ async function showMovieDetail(movie) {
   gridPopularessSection.classList.add('d-none');
   gridProximamenteSection.classList.add('d-none');
   categoryGridSection.classList.add('d-none');
+  searchSection.classList.add('d-none');
   movieSliders.forEach(slider => slider.classList.add('d-none'));
   bannerSection.classList.add('d-none');
 
@@ -102,6 +105,8 @@ goBackButton.addEventListener('click', () => {
       break;
     case 'category-grid-container':
       categoryGridSection.classList.remove('d-none');
+    case 'search-section':
+      searchSection.classList.remove('d-none');
   }
 
   resetDetailView();
