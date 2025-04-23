@@ -99,7 +99,9 @@ const showMovieDetail = async (movie) => {
   movieDescription.textContent = movie.overview || 'Descripción no disponible.';
   movieReleaseDate.textContent = `Fecha de estreno: ${movie.release_date || 'N/A'}`;
 
-  await fetchGenresAndSimilar(movie.id);
+    // Llamar a la nueva función para géneros y recomendaciones
+    await fetchGenresAndRecommendations(movie.id);
+
 
   // Mostrar botón correspondiente
   document.getElementById('go-back').classList.toggle('d-none', !visibleSectionBeforeDetail || visibleSectionBeforeDetail === 'sliders');
@@ -150,8 +152,8 @@ const resetDetailView = () => {
   visibleSectionBeforeDetail = null;
 }
 
-// Cargar géneros y similares
-const fetchGenresAndSimilar = async (movieId) => {
+// Cargar géneros y recomendaciones
+const fetchGenresAndRecommendations = async (id) => {
   const categoriesContainer = document.getElementById('movie-categories');
   const similaresContainer = document.getElementById('movie-similares');
 
@@ -159,13 +161,13 @@ const fetchGenresAndSimilar = async (movieId) => {
   similaresContainer.innerHTML = '';
 
   try {
-    const [detailRes, similarRes] = await Promise.all([
-      Api.get(`movie/${movieId}`, { params: { language: 'es' } }),
-      Api.get(`movie/${movieId}/similar`, { params: { language: 'es' } })
+    const [detailRes, recommendationsRes] = await Promise.all([
+      Api.get(`movie/${id}`, { params: { language: 'es' } }),  // Usamos 'id' en lugar de 'movieId'
+      Api.get(`movie/${id}/recommendations`, { params: { language: 'es' } })  // También se cambia aquí a 'id'
     ]);
 
     const detailData = detailRes.data;
-    const similarData = similarRes.data;
+    const recommendationsData = recommendationsRes.data;
 
     // Categorías
     if (detailData.genres?.length) {
@@ -178,19 +180,19 @@ const fetchGenresAndSimilar = async (movieId) => {
       });
     }
 
-    // Películas similares
-    if (similarData.results?.length) {
+    // Películas recomendadas
+    if (recommendationsData.results?.length) {
       const row = document.createElement('div');
       row.className = 'row justify-content-center';
 
       const titleCol = document.createElement('div');
       titleCol.className = 'col-12 text-center mb-4';
-      titleCol.innerHTML = '<h4 class="fw-bold">Películas similares</h4>';
+      titleCol.innerHTML = '<h4 class="fw-bold">Películas Recomendadas</h4>';
       row.appendChild(titleCol);
 
-      const similaresOrdenados = similarData.results.slice(0, 4);
+      const recomendacionesOrdenadas = recommendationsData.results.slice(0, 4); // Solo las primeras 4 recomendaciones
 
-      similaresOrdenados.forEach((similar) => {
+      recomendacionesOrdenadas.forEach((rec) => {
         const col = document.createElement('div');
         col.className = 'col-6 col-md-3 d-flex justify-content-center mb-4';
 
@@ -199,8 +201,8 @@ const fetchGenresAndSimilar = async (movieId) => {
         card.style.width = '100%';
 
         card.innerHTML = `
-          <img src="https://image.tmdb.org/t/p/original${similar.poster_path}" alt="${similar.title}" class="img-fluid rounded mb-2" style="height: 300px; object-fit: cover;">
-          <h5 class="text-truncate" title="${similar.title}">${similar.title}</h5>
+          <img src="https://image.tmdb.org/t/p/original${rec.poster_path}" alt="${rec.title}" class="img-fluid rounded mb-2" style="height: 300px; object-fit: cover;">
+          <h5 class="text-truncate" title="${rec.title}">${rec.title}</h5>
         `;
 
         col.appendChild(card);
@@ -210,9 +212,10 @@ const fetchGenresAndSimilar = async (movieId) => {
       similaresContainer.appendChild(row);
     }
   } catch (err) {
-    console.error('Error al obtener géneros o similares:', err);
+    console.error('Error al obtener géneros o recomendaciones:', err);
   }
 }
+
 
 
 // Variable para almacenar las películas ya mostradas
