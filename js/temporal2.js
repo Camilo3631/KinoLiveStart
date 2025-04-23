@@ -1,28 +1,9 @@
-// Creamos una istancia de axios
-const Api = axios.create({
-  // BaseURL
-  baseURL: 'https://api.themoviedb.org/3/',
-  // api_key como párametro
-  params: {
-    'api_key': '030eada77e494e280d243a5356401f1a',
-  },
-  Headers: {
-    'Content-Type': 'application/json; charset=utf-8',
-  }
-});
-
 let visibleSectionBeforeDetail = null; // Para recordar qué sección estaba visible antes de entrar al detalle
 
-// Aplicar el cursor de la mano solo a los títulos
-document.querySelectorAll('h4, h5').forEach(el => {
-  el.style.cursor = 'pointer';  // Aplicamos el cursor solo a los h4 y h5
-});
-
-// Detectar clic en títulos de película (h4, h5)
-document.addEventListener('click', async (e) => {
+// Detectar clic en títulos de película
+document.addEventListener('click', async function (e) {
   const titleElement = e.target;
 
-  // Verificar que se hizo clic en un título h4 o h5
   if (titleElement.tagName === 'H4' || titleElement.tagName === 'H5') {
     const movieCard = titleElement.closest('.movie-card');
     if (!movieCard) return;
@@ -37,7 +18,7 @@ document.addEventListener('click', async (e) => {
     } else if (!gridProximamenteSection.classList.contains('d-none')) {
       visibleSectionBeforeDetail = 'gridProximamente';
     } else if (!categoryGridSection.classList.contains('d-none')) {
-      visibleSectionBeforeDetail = 'category-grid-container';
+      visibleSectionBeforeDetail = 'category-grid-container'; 
     } else if (!searchSection.classList.contains('d-none')) {
       visibleSectionBeforeDetail = 'search-section';
     } else if ([...movieSliders].some(slider => !slider.classList.contains('d-none'))) {
@@ -55,6 +36,8 @@ document.addEventListener('click', async (e) => {
 
       if (searchRes.data.results.length > 0) {
         const movie = searchRes.data.results[0];
+
+        // Llamar a la función que obtiene detalles de la película por ID
         getMovieDetailsById(movie.id);
       }
 
@@ -65,13 +48,15 @@ document.addEventListener('click', async (e) => {
 });
 
 // Función general para obtener los detalles de una película por ID
-const getMovieDetailsById = async (id) => {
+async function getMovieDetailsById(id) {
   try {
+    // Hacer la solicitud a la API con el ID de la película
     const movieRes = await Api.get('movie/' + id, {
       params: { language: 'es' }
     });
 
-    showMovieDetail(movieRes.data);
+    // Llamar a la función para mostrar los detalles de la película
+    showMovieDetail(movieRes.data);  
 
   } catch (err) {
     console.error('Error al obtener detalles de la película:', err);
@@ -79,7 +64,7 @@ const getMovieDetailsById = async (id) => {
 }
 
 // Mostrar detalles de la película
-const showMovieDetail = async (movie) => {
+async function showMovieDetail(movie) {
   // Ocultar todas las secciones
   gridTendenciasSection.classList.add('d-none');
   gridPopularessSection.classList.add('d-none');
@@ -99,6 +84,7 @@ const showMovieDetail = async (movie) => {
   movieDescription.textContent = movie.overview || 'Descripción no disponible.';
   movieReleaseDate.textContent = `Fecha de estreno: ${movie.release_date || 'N/A'}`;
 
+  // Mostrar géneros y similares
   await fetchGenresAndSimilar(movie.id);
 
   // Mostrar botón correspondiente
@@ -131,7 +117,6 @@ goBackButton.addEventListener('click', () => {
   resetDetailView();
 });
 
-
 // Botón para volver al home
 document.getElementById('go-back-home').addEventListener('click', () => {
   movieDetailSection.classList.add('d-none');
@@ -142,7 +127,7 @@ document.getElementById('go-back-home').addEventListener('click', () => {
 });
 
 // Reset de los detalles
-const resetDetailView = () => {
+function resetDetailView() {
   moviePoster.innerHTML = '';
   movieBackground.style.backgroundImage = '';
   document.getElementById('movie-categories').innerHTML = '';
@@ -151,7 +136,7 @@ const resetDetailView = () => {
 }
 
 // Cargar géneros y similares
-const fetchGenresAndSimilar = async (movieId) => {
+async function fetchGenresAndSimilar(movieId) {
   const categoriesContainer = document.getElementById('movie-categories');
   const similaresContainer = document.getElementById('movie-similares');
 
@@ -170,7 +155,7 @@ const fetchGenresAndSimilar = async (movieId) => {
     // Categorías
     if (detailData.genres?.length) {
       categoriesContainer.innerHTML = '<h4>Categorías:</h4>';
-      detailData.genres.forEach((genre) => {
+      detailData.genres.forEach(genre => {
         const btn = document.createElement('button');
         btn.textContent = genre.name;
         btn.className = 'btn btn-dark m-1';
@@ -190,7 +175,7 @@ const fetchGenresAndSimilar = async (movieId) => {
 
       const similaresOrdenados = similarData.results.slice(0, 4);
 
-      similaresOrdenados.forEach((similar) => {
+      similaresOrdenados.forEach(similar => {
         const col = document.createElement('div');
         col.className = 'col-6 col-md-3 d-flex justify-content-center mb-4';
 
@@ -212,110 +197,4 @@ const fetchGenresAndSimilar = async (movieId) => {
   } catch (err) {
     console.error('Error al obtener géneros o similares:', err);
   }
-}
-
-
-// Variable para almacenar las películas ya mostradas
-let peliculasMostradas = [];
-
-// Mostrar el grid de tendencias
-const mostrarGridTendencias = () => {
-  // Ocultamos las secciones y los sliders
-  bannerSection.classList.add('d-none');
-  popularesSection.classList.add('d-none');
-  proximamenteSection.classList.add('d-none');
-  categoryGridSection.classList.add('d-none');
-  movieSliders.forEach(slider => slider.classList.add('d-none'));
-
-  // Mostramos el grid de tendencias
-  gridTendenciasSection.classList.remove('d-none');
-  // Mostramos el botón de "Volver"
-  showLessTendenciasButton.classList.remove('d-none');
-};
-
-// Ocultar el grid de tendencias
-const ocultarGridTendencias = () => {
-  // Volvemos a mostrar las secciones
-  bannerSection.classList.remove('d-none');
-  popularesSection.classList.remove('d-none');
-  proximamenteSection.classList.remove('d-none');
-  categoryGridSection.classList.add('d-none');
-
-  // Volvemos a mostrar todos los sliders de películas
-  movieSliders.forEach(slider => slider.classList.remove('d-none'));
-
-  // Ocultamos el grid de tendencias
-  gridTendenciasSection.classList.add('d-none');
-  // Ocultamos el botón de "Volver"
-  showLessTendenciasButton.classList.add('d-none');
-};
-
-// Función para generar el grid de películas
-const generarGridMoviesTendencias = () => {
-  // Añadir el evento solo una vez
-  if (!showMoreTendenciasButton.dataset.eventAdded) {
-    showMoreTendenciasButton.addEventListener('click', async function () {
-      // Mostrar el grid de tendencias
-      mostrarGridTendencias();
-
-      // Limpiamos el contenedor antes de llenarlo
-      const moviesContainer = gridTendenciasSection.querySelector('.movies-container');
-
-      try {
-        // Hacemos la petición de las películas
-        let response = await Api.get('trending/movie/week', { params: { language: 'es' } });
-
-        // Si no se obtienen resultados en español, intentamos obtenerlos en inglés
-        if (!response.data.results || response.data.results.length === 0) {
-          response = await Api.get('trending/movie/week', { params: { language: 'en-US' } });
-        }
-
-        // Verificamos si la respuesta contiene películas
-        if (response.data.results && response.data.results.length > 0) {
-          // Tomamos solo las 20 primeras películas que no estén ya mostradas
-          const peliculasNuevas = response.data.results.filter(movie => !peliculasMostradas.includes(movie.id));
-
-          // Limitamos a 20 películas nuevas
-          const peliculasLimitadas = peliculasNuevas.slice(0, 20);
-
-          // Agregar películas limitadas al contenedor
-          peliculasLimitadas.forEach(movie => {
-            const movieCard = document.createElement('div');
-            movieCard.classList.add('movie-card'); // Aplicamos la clase movie-card-grid
-
-
-            movieCard.innerHTML = `
-              <img src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
-              <h5>${movie.title}</h5>
-            `;
-
-
-            // Evita el scroll automático al cambiar el hash
-            movieCard.addEventListener('click', () => {
-              history.pushState(null, '', '#movie' + movie.id);
-            });
-
-
-            moviesContainer.appendChild(movieCard);
-
-            // Añadimos la película al arreglo de películas mostradas
-            peliculasMostradas.push(movie.id);
-          });
-        } else {
-          console.warn('No se encontraron películas para mostrar.');
-        }
-      } catch (error) {
-        console.error('Error al obtener películas de la API de tendencias:', error);
-      }
-    });
-
-    // Marcar que el evento ha sido agregado para evitar duplicación
-    showMoreTendenciasButton.dataset.eventAdded = 'true';
-  }
-
-  // Acción al hacer clic en "Ver menos" para ocultar el grid de tendencias
-  showLessTendenciasButton.addEventListener('click', ocultarGridTendencias);
-};
-
-// Llamamos a la función para generar el grid de películas
-generarGridMoviesTendencias();
+} 

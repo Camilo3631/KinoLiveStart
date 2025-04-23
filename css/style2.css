@@ -264,11 +264,13 @@ h5 {
 
   #grid-populares .movies-container {
     width: 75%;  /* Cambia a 75% o 70% según lo desees */
+   
     margin: 0 auto;  /* Centrado horizontal */
     display: grid;
     grid-template-columns: repeat(4, 1fr); /* 4 columnas */
     gap: 20px;  /* Espacio entre las cartas */
     padding-top: 20px;
+    padding-bottom: 40px;
   }
 
   #grid-populares {
@@ -351,7 +353,7 @@ h5 {
 /* Estilos para cada tarjeta de película */
 .movie-card {
     min-width: 200px; /* Para mantener un tamaño consistente */
-    padding: 10px;
+    padding-bottom: 20px;
     text-align: center;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -490,6 +492,7 @@ h5 {
     z-index: 2;
   }
   
+  
   .background {
     position: absolute;
     top: 0;
@@ -500,7 +503,20 @@ h5 {
     background-position: center;
     z-index: -1;
     border-radius: 10px;
+    background:linear-gradient(
+      180deg, 
+      rgba(0, 0, 0, 0.35) 19.27%, 
+      rgba(0, 0, 0, 0) 29.17%
+      ), 
+    
   }
+
+  h4, h5 {
+    cursor: pointer;
+  }
+  
+
+ 
   
   .detail-container {
     display: flex;
