@@ -10,51 +10,51 @@ const api = axios.create({
     'Content-Type': 'application/json; charset=utf-8'
   },
 })
-
-// Función asíncona para obetener peliculas en tendecias
 const getTredingMovies = async () => {
   // Buscar el contenedor donde se muestran las peliculas
   const movieContainer = document.querySelector('.movies-container');
   if (!movieContainer) {
-    console.error('No se encontró el contendor de peliculas.');
+    console.error('No se encontró el contenedor de peliculas.');
     return;
   }
-  try {
 
-    const { data } = await api('trending/movie/week', { params: { language: 'es' } });
+  try {
+    let { data } = await api('trending/movie/week', { params: { language: 'es' } });
 
     // Si no hay resultados en Español, intenta obtener en inglés
     if (!data.results || data.results.length === 0) {
       ({ data } = await api('trending/movie/week', { params: { language: 'en-US' } }));
     }
 
-
     const movies = data.results;   // Almacenar la respuesta las peliculas
-    movieContainer.innerHTML = ''; // limpia cualquier contendio previo del contenedor
+    movieContainer.innerHTML = ''; // Limpiar cualquier contenido previo del contenedor
 
     // Mostrar las 6 primeras peliculas
-    movies.slice(0, 6).forEach(movie => {  // limitar a 6 peliculas
-      const movieCard = document.createElement('div');  // Crear el contendor de cada fila
-      movieCard.classList.add('movie-card'); // Agregar la clase 'move-card'
+    movies.slice(0, 6).forEach(movie => {  // Limitar a 6 peliculas
+      const movieCard = document.createElement('div');  // Crear el contenedor de cada película
+      movieCard.classList.add('movie-card'); // Agregar la clase 'movie-card'
 
-      // Rellenar el contendor con la imagen  y titúlo de la pelicula
+      // Rellenar el contenedor con la imagen y título de la película
       movieCard.innerHTML = ` 
-             <img src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
-              <h5>${movie.title}</h5>
-              
-            `;
+        <img src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
+        <h5>${movie.title}</h5>
+      `;
 
-      // Agregar la tarjeta de cada pelicula al contendor
+      // Agregar el evento de clic para actualizar el hash
+      movieCard.addEventListener('click', () => {
+        location.hash = '#movie' + movie.id;  // Actualiza el hash con el ID de la película
+
+      });
+
+      // Agregar la tarjeta de cada película al contenedor
       movieContainer.appendChild(movieCard);
-
     });
 
   } catch (error) {
-    console.error('Ocurrió un problema:', error); // Si ocurrio en un error mostrarlo en la consola)
-
+    console.error('Ocurrió un problema:', error); // Si ocurrió un error mostrarlo en la consola
   }
-
 };
+
 
 // Función asíncrona para mostrar las categorías de las películas
 const getCategoriesPreview = async () => {
@@ -220,11 +220,19 @@ const getMoviesCategory = async (id) => { // Solo recibe el id
     allMovies.forEach(movie => {
       const movieCard = document.createElement('div');
       movieCard.classList.add('movie-card');
+
+
       movieCard.innerHTML = `
           <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}">
           <h5>${movie.title}</h5>
           <a href="https://www.themoviedb.org/movie/${movie.id}" target="_blank"></a>
         `;
+
+      // Evita el scroll automático al cambiar el hash
+      movieCard.addEventListener('click', () => {
+        history.pushState(null, '', '#movie' + movie.id);
+      });
+
       moviesContainer.appendChild(movieCard);
     });
 
@@ -276,10 +284,17 @@ const getMoviesSearch = async (query) => {
       const movieElement = document.createElement('div');
       movieElement.classList.add('movie-card', 'mb-4');
 
+
       movieElement.innerHTML = `
            <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" class="img-fluid rounded">
            <h5>${movie.title}</h5>
           `;
+
+      // Asegúrate de que el evento esté en el movieElement
+      movieElement.addEventListener('click', () => {
+        history.pushState(null, '', '#movie' + movie.id);
+      });
+
 
       container.appendChild(movieElement);
     });
@@ -336,7 +351,7 @@ const toggleButtonsVisibility = (buttonType) => {
 
 // Función para el bóton de volver
 const volverBtn = document.getElementById('back-btn');
-volverBtn.addEventListener('click',  () => {
+volverBtn.addEventListener('click', () => {
   // Simula el clic del botón de atrás del navegador
   window.history.back(); // Retrocede la página sin borrar el contenido
 
@@ -355,4 +370,8 @@ homeBtn.addEventListener('click', () => {
   // Mostrar solo el botón de "Volver al Home"
   toggleButtonsVisibility('home');
 });
+
+
+
+
 
