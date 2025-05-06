@@ -86,6 +86,8 @@ const homePage = () => {
   getCategoriesPreview();
   getTredingMovies();
   generarGridMoviesTendencias();
+  generarGridMoviesPopulares();
+  generarGridMovieProximamente();
 
 
 };
@@ -310,7 +312,7 @@ const searchPage = () => {
 // Función para el slider y grid de tendencias
 const trendsPage = () => {
   console.log('TRENDS!!');
-  movieContainer.innerHTML = '';
+
 
    bannerSection.classList.add('d-none');
    proximamenteSection.classList.add('d-none');

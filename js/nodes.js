@@ -8,8 +8,8 @@ const goBackButton = document.getElementById('go-back');
 
 // Secciones para mostrar y ocultar (grids y sliders)
 const bannerSection = document.getElementById('banner');
-const  gridTendenciasSection = document.getElementById('grid-tendencias');
-const gridPopularessSection = document.getElementById('grid-populares');
+const gridTendenciasSection = document.getElementById('grid-tendencias');
+const gridPopularesSection = document.getElementById('grid-populares');
 const gridProximamenteSection = document.getElementById('grid-proximamente');
 const searchSection = document.getElementById('search-section');
 const movieSliders = document.querySelectorAll('.movie-slider');
@@ -18,6 +18,10 @@ const movieContainer = document.querySelector('.movies-container');
 // Obtén las secciones y botones de manera global
 const showMoreTendenciasButton = document.getElementById('show-more-tendencias');
 const showLessTendenciasButton = document.getElementById('show-less-tendencias');
+const showlesspopulareButton = document.getElementById('show-less-populares');
+const showmorepopularButton = document.getElementById('show-more-populares');
+const showlessproximamenteButton = document.getElementById('show-less-proximamente');
+const showMoreProximamneteButton = document.getElementById('show-more-proximamente');
 const tendenciasSection = document.getElementById('tendencias');
 const popularesSection = document.getElementById('populares');
 const proximamenteSection = document.getElementById('proximamente');
