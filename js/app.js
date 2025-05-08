@@ -11,6 +11,48 @@ const api = axios.create({
   },
 })
 
+// Creamos el observador con IntersectionObserver para cargar las imágenes al estar cerca al viweport
+const createObserver =  () =>  {
+  // Seleccionamos todas las imagenes
+  const img = document.querySelectorAll('img');
+
+ // Configuración del IntersectionObserver
+ const options = {
+     rootMargin: '200px', // Define un margen para el trigger antes de que la imagen entre al viewport
+     threshold: 0.1,  // Cuando el 10% de la imagen esté visible, se activará el callback
+ };
+
+ // Callback que se ejecuta cuando la imágen entra en el área visible
+ const callback = (entries, observer) => {
+   entries.forEach(entry => {
+       // Si la imagen esta visible
+       if (entry.isIntersecting) {
+         const img = entry.target;
+         const dataSrc = img.dataset.src; // Obtiene el data-src;
+
+         // Carga la imagen y elimina el data-src
+        if (dataSrc) {
+          img.src = dataSrc;
+          img.removeAttribute('data-src');
+        }
+
+          // Deja de observar la imágen 
+          observer.unobserve(img);
+       }
+   })
+ };
+
+ // Crea y comienza a observar las imágenes
+ const observer = new IntersectionObserver(callback, options);
+
+ img.forEach(img => observer.observe(img)); 
+
+};
+
+// Ejecutamos la función una vez que el DOM esté completamente cargado
+document.addEventListener('DOMContentLoaded', createObserver);
+
+
 
 const getMoviesProximmamente = async () => {
   // Buscar el contenedor donde se muestran las peliculas
@@ -46,7 +88,7 @@ const getMoviesProximmamente = async () => {
 
       // Rellenar el contenedor con la imagen y título de la película
       movieCard.innerHTML = ` 
-        <img src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
+        <img data-src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
         <h5>${movie.title}</h5>
       `;
 
@@ -57,6 +99,9 @@ const getMoviesProximmamente = async () => {
 
       // Agregar la tarjeta de cada película al contenedor
       movieContainer.appendChild(movieCard);
+
+      // 🔥 Llamamos a createObserver después de agregar las imágenes dinámicamente
+      createObserver();
     });
 
   } catch (error) {
@@ -101,7 +146,7 @@ const getPopularMovie = async () => {
 
       // Rellenar el contenedor con la imagen y título de la película
       movieCard.innerHTML = ` 
-        <img src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
+        <img data-src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
         <h5>${movie.title}</h5>
       `;
 
@@ -112,6 +157,9 @@ const getPopularMovie = async () => {
 
       // Agregar la tarjeta de cada película al contenedor
       movieContainer.appendChild(movieCard);
+
+       // 🔥 Llamamos a createObserver después de agregar las imágenes dinámicamente
+       createObserver();
     });
 
   } catch (error) {
@@ -158,7 +206,7 @@ const getTredingMovies = async () => {
 
       // Rellenar el contenedor con la imagen y título de la película
       movieCard.innerHTML = ` 
-        <img src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
+        <img data-src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
         <h5>${movie.title}</h5>
       `;
 
@@ -169,6 +217,9 @@ const getTredingMovies = async () => {
 
       // Agregar la tarjeta de cada película al contenedor
       movieContainer.appendChild(movieCard);
+
+        // 🔥 Llamamos a createObserver después de agregar las imágenes dinámicamente
+        createObserver();
     });
 
   } catch (error) {
@@ -528,630 +579,630 @@ homeBtn.addEventListener('click', () => {
 
 
 
-  let visibleSectionBeforeDetail = null; // Para recordar la seccion estaba visiible antes de entrar en datalles
+let visibleSectionBeforeDetail = null; // Para recordar la seccion estaba visiible antes de entrar en datalles
 
 
-  document.querySelectorAll('h4', 'h5').forEach(el => {
-    el.style.cursor = 'pointer';
+document.querySelectorAll('h4', 'h5').forEach(el => {
+  el.style.cursor = 'pointer';
 
-  });
+});
 
-  document.addEventListener('click', async (e) => {
-    const titleElement = e.target;
+document.addEventListener('click', async (e) => {
+  const titleElement = e.target;
 
-    if (titleElement.tagName === 'H4' || titleElement.tagName === 'H5') {
-      const movieCard = titleElement.closest('.movie-card');
-      if (!movieCard) return;
+  if (titleElement.tagName === 'H4' || titleElement.tagName === 'H5') {
+    const movieCard = titleElement.closest('.movie-card');
+    if (!movieCard) return;
 
-      const movieTitleText = titleElement.textContent;
+    const movieTitleText = titleElement.textContent;
 
-      // Guardar la sección visible antes de entrar al detalle
-      if (!gridTendenciasSection.classList.contains('d-none')) {
-        visibleSectionBeforeDetail = 'gridTedencias';
-      } else if (!gridPopularesSection.classList.contains('d-none')) {
-        visibleSectionBeforeDetail = 'gridPopulares';
-      } else if (!gridProximamenteSection.classList.contains('d-none')) {
-        visibleSectionBeforeDetail = 'gridProximamente';
-      } else if (!categoryGridSection.classList.contains('d-none')) {
-        visibleSectionBeforeDetail = 'category-grid-container';
-      } else if (!searchSection.classList.contains('d-none')) {
-        visibleSectionBeforeDetail = 'search-section';
-      } else if ([...movieSliders].some(slider => !slider.classList.contains('d-none'))) {
-        visibleSectionBeforeDetail = 'sliders';
-      }
-
-
-      // Buscar la película y mostrar detalles
-      try {
-        const searchRes = await api('search/movie', {
-          params: {
-            query: movieTitleText,
-            language: 'es'
-          }
-
-        });
-
-        if (searchRes.data.results.length > 0) {
-          const movie = searchRes.data.results[0];
-          getMovieDetailsById(movie.id);
-        }
-
-      } catch (error) {
-        console.error('Error al buscar la película:', error);
-      }
+    // Guardar la sección visible antes de entrar al detalle
+    if (!gridTendenciasSection.classList.contains('d-none')) {
+      visibleSectionBeforeDetail = 'gridTedencias';
+    } else if (!gridPopularesSection.classList.contains('d-none')) {
+      visibleSectionBeforeDetail = 'gridPopulares';
+    } else if (!gridProximamenteSection.classList.contains('d-none')) {
+      visibleSectionBeforeDetail = 'gridProximamente';
+    } else if (!categoryGridSection.classList.contains('d-none')) {
+      visibleSectionBeforeDetail = 'category-grid-container';
+    } else if (!searchSection.classList.contains('d-none')) {
+      visibleSectionBeforeDetail = 'search-section';
+    } else if ([...movieSliders].some(slider => !slider.classList.contains('d-none'))) {
+      visibleSectionBeforeDetail = 'sliders';
     }
-  });
 
 
-  // Función general para obtener los detalles de una película por ID
-  const getMovieDetailsById = async (id) => {
-
+    // Buscar la película y mostrar detalles
     try {
-      const movieRes = await api('movie/' + id, {
+      const searchRes = await api('search/movie', {
         params: {
-          language: 'es',
+          query: movieTitleText,
+          language: 'es'
         }
 
       });
 
-      showMovieDetail(movieRes.data);
-
-    } catch (error) {
-      console.error('Error al obtener detalles de la película:', error)
-    }
-
-  }
-
-  //  Mostrar detalles de la película
-  const showMovieDetail = async (movie) => {
-    // Ocultar todas las secciones
-    gridTendenciasSection.classList.add('d-none');
-    gridPopularesSection.classList.add('d-none');
-    gridProximamenteSection.classList.add('d-none');
-    categoryGridSection.classList.add('d-none');
-    searchSection.classList.add('d-none');
-    movieSliders.forEach(slider => slider.classList.add('d-none'));
-    bannerSection.classList.add('d-none');
-
-    // Mostrar detalle
-    movieDetailSection.classList.remove('d-none');
-
-    // Mostrar info
-    movieBackground.style.backgroundImage = `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`;
-        moviePoster.innerHTML = `<img src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">`;
-      movieTitle.textContent = movie.title;
-      movieDescription.textContent = movie.overview || 'Descripción no disponible.';
-      movieReleaseDate.textContent = `Fecha de estreno: ${movie.release_date || 'N/A'}`;
-
-      // Llamar a la nueva función para géneros y recomendaciones
-      await fetchGenresAndRecommendations(movie.id);
-
-
-      // Mostrar botón correspondiente
-      document.getElementById('go-back').classList.toggle('d-none', !visibleSectionBeforeDetail || visibleSectionBeforeDetail === 'sliders');
-      document.getElementById('go-back-home').classList.toggle('d-none', visibleSectionBeforeDetail !== 'sliders');
-    };
-
-
-    // Botón para volver a la sección anterior
-    goBackButton.addEventListener('click', () => {
-      movieDetailSection.classList.add('d-none');
-
-      switch (visibleSectionBeforeDetail) {
-
-        case 'gridTedencias':
-          gridTendenciasSection.classList.remove('d-none');
-          break;
-        case 'gridPopulares':
-          gridPopularesSection.classList.remove('d-none');
-          break;
-        case 'gridProximamente':
-          gridProximamenteSection.classList.remove('d-none');
-          break;
-        case 'category-grid-container':
-          categoryGridSection.classList.remove('d-none');
-          break;
-        case 'search-section':
-          searchSection.classList.remove('d-none');
-          break;
-
+      if (searchRes.data.results.length > 0) {
+        const movie = searchRes.data.results[0];
+        getMovieDetailsById(movie.id);
       }
 
-      resetDetailView();
+    } catch (error) {
+      console.error('Error al buscar la película:', error);
+    }
+  }
+});
+
+
+// Función general para obtener los detalles de una película por ID
+const getMovieDetailsById = async (id) => {
+
+  try {
+    const movieRes = await api('movie/' + id, {
+      params: {
+        language: 'es',
+      }
 
     });
 
+    showMovieDetail(movieRes.data);
 
-    // Botón para volver al home
-    document.getElementById('go-back-home').addEventListener('click', () => {
-      movieDetailSection.classList.add('d-none');
-      bannerSection.classList.remove('d-none');
-      movieSliders.forEach(slider => slider.classList.remove('d-none'));
+  } catch (error) {
+    console.error('Error al obtener detalles de la película:', error)
+  }
 
-      resetDetailView();
-    })
+}
 
-    // Reset de los detalles
-    const resetDetailView = () => {
-      moviePoster.innerHTML = '';
-      movieBackground.style.backgroundImage = '';
-      document.getElementById('movie-categories').innerHTML = '';
-      document.getElementById('movie-similares').innerHTML = '';
-      visibleSectionBeforeDetail = null;
+//  Mostrar detalles de la película
+const showMovieDetail = async (movie) => {
+  // Ocultar todas las secciones
+  gridTendenciasSection.classList.add('d-none');
+  gridPopularesSection.classList.add('d-none');
+  gridProximamenteSection.classList.add('d-none');
+  categoryGridSection.classList.add('d-none');
+  searchSection.classList.add('d-none');
+  movieSliders.forEach(slider => slider.classList.add('d-none'));
+  bannerSection.classList.add('d-none');
+
+  // Mostrar detalle
+  movieDetailSection.classList.remove('d-none');
+
+  // Mostrar info
+  movieBackground.style.backgroundImage = `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`;
+  moviePoster.innerHTML = `<img src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">`;
+  movieTitle.textContent = movie.title;
+  movieDescription.textContent = movie.overview || 'Descripción no disponible.';
+  movieReleaseDate.textContent = `Fecha de estreno: ${movie.release_date || 'N/A'}`;
+
+  // Llamar a la nueva función para géneros y recomendaciones
+  await fetchGenresAndRecommendations(movie.id);
+
+
+  // Mostrar botón correspondiente
+  document.getElementById('go-back').classList.toggle('d-none', !visibleSectionBeforeDetail || visibleSectionBeforeDetail === 'sliders');
+  document.getElementById('go-back-home').classList.toggle('d-none', visibleSectionBeforeDetail !== 'sliders');
+};
+
+
+// Botón para volver a la sección anterior
+goBackButton.addEventListener('click', () => {
+  movieDetailSection.classList.add('d-none');
+
+  switch (visibleSectionBeforeDetail) {
+
+    case 'gridTedencias':
+      gridTendenciasSection.classList.remove('d-none');
+      break;
+    case 'gridPopulares':
+      gridPopularesSection.classList.remove('d-none');
+      break;
+    case 'gridProximamente':
+      gridProximamenteSection.classList.remove('d-none');
+      break;
+    case 'category-grid-container':
+      categoryGridSection.classList.remove('d-none');
+      break;
+    case 'search-section':
+      searchSection.classList.remove('d-none');
+      break;
+
+  }
+
+  resetDetailView();
+
+});
+
+
+// Botón para volver al home
+document.getElementById('go-back-home').addEventListener('click', () => {
+  movieDetailSection.classList.add('d-none');
+  bannerSection.classList.remove('d-none');
+  movieSliders.forEach(slider => slider.classList.remove('d-none'));
+
+  resetDetailView();
+})
+
+// Reset de los detalles
+const resetDetailView = () => {
+  moviePoster.innerHTML = '';
+  movieBackground.style.backgroundImage = '';
+  document.getElementById('movie-categories').innerHTML = '';
+  document.getElementById('movie-similares').innerHTML = '';
+  visibleSectionBeforeDetail = null;
+}
+
+// Cargar géneros y recomendaciones
+const fetchGenresAndRecommendations = async (id) => {
+  const categoriesContainer = document.getElementById('movie-categories');
+  const similaresContainer = document.getElementById('movie-similares');
+
+  categoriesContainer.innerHTML = '';
+  similaresContainer.innerHTML = '';
+
+  try {
+
+    const [detailRes, recommendationsRes] = await Promise.all([
+      api(`movie/${id}`, { params: { language: 'es' } }),  // Usamos 'id' en lugar de 'movieId'
+      api(`movie/${id}/recommendations`, { params: { language: 'es' } })  // También se cambia aquí a 'id'
+    ]);
+
+    const detailData = detailRes.data;
+    const recommendationsData = recommendationsRes.data;
+
+    // Categorías
+    if (detailData.genres?.length) {
+      categoriesContainer.innerHTML = '<h4>Categorías:</h4>';
+      detailData.genres.forEach((genre) => {
+        const btn = document.createElement('button');
+        btn.textContent = genre.name;
+        btn.className = 'btn btn-dark m-1';
+        categoriesContainer.appendChild(btn);
+      });
+
     }
 
-    // Cargar géneros y recomendaciones
-    const fetchGenresAndRecommendations = async (id) => {
-      const categoriesContainer = document.getElementById('movie-categories');
-      const similaresContainer = document.getElementById('movie-similares');
+    // Películas recomendadas
+    if (recommendationsData.results?.length) {
+      const row = document.createElement('div');
+      row.className = 'row jusitify-content-center';
 
-      categoriesContainer.innerHTML = '';
-      similaresContainer.innerHTML = '';
+      const titleCol = document.createElement('div');
+      titleCol.className = 'col-12 text-center mb-4';
+      titleCol.innerHTML = '<h4 class="fw-bold">Películas Recomendadas</h4>';
+      row.appendChild(titleCol);
 
-      try {
+      const recomendacionesOrdenadas = recommendationsData.results.slice(0, 4);
 
-        const [detailRes, recommendationsRes] = await Promise.all([
-          api(`movie/${id}`, { params: { language: 'es' } }),  // Usamos 'id' en lugar de 'movieId'
-          api(`movie/${id}/recommendations`, { params: { language: 'es' } })  // También se cambia aquí a 'id'
-        ]);
+      recomendacionesOrdenadas.forEach((rec) => {
+        const col = document.createElement('div');
+        col.className = 'col-6 col-md-3 d-flex justify-content-center mb-4';
 
-        const detailData = detailRes.data;
-        const recommendationsData = recommendationsRes.data;
+        const card = document.createElement('div')
+        card.className = 'movie-card text-center p-2 shadow ronunded';
+        card.style.width = '100%';
 
-        // Categorías
-        if (detailData.genres?.length) {
-          categoriesContainer.innerHTML = '<h4>Categorías:</h4>';
-          detailData.genres.forEach((genre) => {
-            const btn = document.createElement('button');
-            btn.textContent = genre.name;
-            btn.className = 'btn btn-dark m-1';
-            categoriesContainer.appendChild(btn);
-          });
-
-        }
-
-        // Películas recomendadas
-        if (recommendationsData.results?.length) {
-          const row = document.createElement('div');
-          row.className = 'row jusitify-content-center';
-
-          const titleCol = document.createElement('div');
-          titleCol.className = 'col-12 text-center mb-4';
-          titleCol.innerHTML = '<h4 class="fw-bold">Películas Recomendadas</h4>';
-          row.appendChild(titleCol);
-
-          const recomendacionesOrdenadas = recommendationsData.results.slice(0, 4);
-
-          recomendacionesOrdenadas.forEach((rec) => {
-            const col = document.createElement('div');
-            col.className = 'col-6 col-md-3 d-flex justify-content-center mb-4';
-
-            const card = document.createElement('div')
-            card.className = 'movie-card text-center p-2 shadow ronunded';
-            card.style.width = '100%';
-
-            card.innerHTML = `
+        card.innerHTML = `
            <img src="https://image.tmdb.org/t/p/original${rec.poster_path}" alt="${rec.title}" class="img-fluid rounded mb-2" style="height: 300px; object-fit: cover;">
            <h5 class="text-truncate" title="${rec.title}">${rec.title}</h5>
           `;
 
-            col.appendChild(card);
-            row.appendChild(col);
+        col.appendChild(card);
+        row.appendChild(col);
 
-          });
+      });
 
-          similaresContainer.appendChild(row);
+      similaresContainer.appendChild(row);
 
+    }
+
+  } catch (error) {
+    console.error('Error al obtener géneros o recomendaciones:', error);
+  }
+
+};
+
+
+// Variable para almacenar las películas ya mostradas
+let peliculasMostradasTendencias = [];
+
+// Mostrar el grid de tendencias
+const mostrarGridTendencias = () => {
+  // Ocultamos las secciones y los sliders
+  bannerSection.classList.add('d-none');
+  popularesSection.classList.add('d-none');
+  proximamenteSection.classList.add('d-none');
+  categoryGridSection.classList.add('d-none');
+  movieSliders.forEach(slider => slider.classList.add('d-none'));
+
+  // Mostramos el grid de tendencias
+  gridTendenciasSection.classList.remove('d-none');
+  // Mostramos el botón de "Volver"
+  showLessTendenciasButton.classList.remove('d-none');
+};
+
+// Ocultar el grid de tendencias
+const ocultarGridTendencias = () => {
+  // Volvemos a mostrar las secciones
+  bannerSection.classList.remove('d-none');
+  popularesSection.classList.remove('d-none');
+  proximamenteSection.classList.remove('d-none');
+  categoryGridSection.classList.add('d-none');
+
+  // Volvemos a mostrar todos los sliders de películas
+  movieSliders.forEach(slider => slider.classList.remove('d-none'));
+
+  // Ocultamos el grid de tendencias
+  gridTendenciasSection.classList.add('d-none');
+  // Ocultamos el botón de "Volver"
+  showLessTendenciasButton.classList.add('d-none');
+};
+
+// Función para mostrar los skeletons antes de cargar las películas
+const mostrarSkeletonstendecias = () => {
+  const moviesContainer = gridTendenciasSection.querySelector('.movies-grid-container');
+  for (let i = 0; i < 20; i++) { // Cambia 20 por el número deseado de skeletons
+    const skeleton = document.createElement('div');
+    skeleton.classList.add('loading-card-grid');
+    moviesContainer.appendChild(skeleton);  // Añadir los skeletons al contenedor principal
+  }
+};
+
+// Función para ocultar los skeletons después de que las películas se carguen
+const ocultarskeletontendecias = () => {
+  const moviesContainer = gridTendenciasSection.querySelector('.movies-grid-container');
+  const skeletons = moviesContainer.querySelectorAll('.loading-card-grid');
+  skeletons.forEach(skeleton => skeleton.remove());  // Eliminar todos los skeletons
+};
+
+// Función para generar el grid de películas
+const generarGridMoviesTendencias = () => {
+  // Añadir el evento solo una vez
+  if (!showMoreTendenciasButton.dataset.eventAdded) {
+    showMoreTendenciasButton.addEventListener('click', async function () {
+      // Mostrar el grid de tendencias
+      mostrarGridTendencias();
+
+      // Mostrar skeletons antes de hacer la solicitud
+      mostrarSkeletonstendecias();
+
+      try {
+        // Hacemos la petición de las películas
+        let response = await api('trending/movie/week', { params: { language: 'es' } });
+
+        // Si no se obtienen resultados en español, intentamos obtenerlos en inglés
+        if (!response.data.results || response.data.results.length === 0) {
+          response = await api('trending/movie/week', { params: { language: 'en-US' } });
         }
 
-      } catch (error) {
-        console.error('Error al obtener géneros o recomendaciones:', error);
-      }
+        // Verificamos si la respuesta contiene películas
+        if (response.data.results && response.data.results.length > 0) {
+          // Tomamos solo las 20 primeras películas que no estén ya mostradas
+          const peliculasNuevas = response.data.results.filter(movie => !peliculasMostradasTendencias.includes(movie.id));
 
-    };
+          // Limitamos a 20 películas nuevas
+          const peliculasLimitadas = peliculasNuevas.slice(0, 20);
 
+          // Agregar películas limitadas al contenedor
+          peliculasLimitadas.forEach(movie => {
+            const movieCard = document.createElement('div');
+            movieCard.classList.add('movie-card'); // Aplicamos la clase movie-card-grid
 
-    // Variable para almacenar las películas ya mostradas
-    let peliculasMostradasTendencias = [];
-
-    // Mostrar el grid de tendencias
-    const mostrarGridTendencias = () => {
-      // Ocultamos las secciones y los sliders
-      bannerSection.classList.add('d-none');
-      popularesSection.classList.add('d-none');
-      proximamenteSection.classList.add('d-none');
-      categoryGridSection.classList.add('d-none');
-      movieSliders.forEach(slider => slider.classList.add('d-none'));
-
-      // Mostramos el grid de tendencias
-      gridTendenciasSection.classList.remove('d-none');
-      // Mostramos el botón de "Volver"
-      showLessTendenciasButton.classList.remove('d-none');
-    };
-
-    // Ocultar el grid de tendencias
-    const ocultarGridTendencias = () => {
-      // Volvemos a mostrar las secciones
-      bannerSection.classList.remove('d-none');
-      popularesSection.classList.remove('d-none');
-      proximamenteSection.classList.remove('d-none');
-      categoryGridSection.classList.add('d-none');
-
-      // Volvemos a mostrar todos los sliders de películas
-      movieSliders.forEach(slider => slider.classList.remove('d-none'));
-
-      // Ocultamos el grid de tendencias
-      gridTendenciasSection.classList.add('d-none');
-      // Ocultamos el botón de "Volver"
-      showLessTendenciasButton.classList.add('d-none');
-    };
-
-    // Función para mostrar los skeletons antes de cargar las películas
-    const mostrarSkeletonstendecias = () => {
-      const moviesContainer = gridTendenciasSection.querySelector('.movies-grid-container');
-      for (let i = 0; i < 20; i++) { // Cambia 20 por el número deseado de skeletons
-        const skeleton = document.createElement('div');
-        skeleton.classList.add('loading-card-grid');
-        moviesContainer.appendChild(skeleton);  // Añadir los skeletons al contenedor principal
-      }
-    };
-
-    // Función para ocultar los skeletons después de que las películas se carguen
-    const ocultarskeletontendecias = () => {
-      const moviesContainer = gridTendenciasSection.querySelector('.movies-grid-container');
-      const skeletons = moviesContainer.querySelectorAll('.loading-card-grid');
-      skeletons.forEach(skeleton => skeleton.remove());  // Eliminar todos los skeletons
-    };
-
-    // Función para generar el grid de películas
-    const generarGridMoviesTendencias = () => {
-      // Añadir el evento solo una vez
-      if (!showMoreTendenciasButton.dataset.eventAdded) {
-        showMoreTendenciasButton.addEventListener('click', async function () {
-          // Mostrar el grid de tendencias
-          mostrarGridTendencias();
-
-          // Mostrar skeletons antes de hacer la solicitud
-          mostrarSkeletonstendecias();
-
-          try {
-            // Hacemos la petición de las películas
-            let response = await api('trending/movie/week', { params: { language: 'es' } });
-
-            // Si no se obtienen resultados en español, intentamos obtenerlos en inglés
-            if (!response.data.results || response.data.results.length === 0) {
-              response = await api('trending/movie/week', { params: { language: 'en-US' } });
-            }
-
-            // Verificamos si la respuesta contiene películas
-            if (response.data.results && response.data.results.length > 0) {
-              // Tomamos solo las 20 primeras películas que no estén ya mostradas
-              const peliculasNuevas = response.data.results.filter(movie => !peliculasMostradasTendencias.includes(movie.id));
-
-              // Limitamos a 20 películas nuevas
-              const peliculasLimitadas = peliculasNuevas.slice(0, 20);
-
-              // Agregar películas limitadas al contenedor
-              peliculasLimitadas.forEach(movie => {
-                const movieCard = document.createElement('div');
-                movieCard.classList.add('movie-card'); // Aplicamos la clase movie-card-grid
-
-                movieCard.innerHTML = `
+            movieCard.innerHTML = `
               <img src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
               <h5>${movie.title}</h5>
             `;
 
-                // Evita el scroll automático al cambiar el hash
-                movieCard.addEventListener('click', () => {
-                  history.pushState(null, '', '#movie' + movie.id);
-                });
+            // Evita el scroll automático al cambiar el hash
+            movieCard.addEventListener('click', () => {
+              history.pushState(null, '', '#movie' + movie.id);
+            });
 
-                // Añadimos la tarjeta de la película al contenedor
-                const moviesContainer = gridTendenciasSection.querySelector('.movies-grid-container');
-                moviesContainer.appendChild(movieCard);
+            // Añadimos la tarjeta de la película al contenedor
+            const moviesContainer = gridTendenciasSection.querySelector('.movies-grid-container');
+            moviesContainer.appendChild(movieCard);
 
-                // Añadimos la película al arreglo de películas mostradas
-                peliculasLimitadas.push(movie.id);
-              });
-            } else {
-              console.warn('No se encontraron películas para mostrar.');
-            }
-          } catch (error) {
-            console.error('Error al obtener películas de la API de tendencias:', error);
-          }
-
-          // Ocultar los skeletons después de cargar las películas
-          ocultarskeletontendecias();
-        });
-
-        // Marcar que el evento ha sido agregado para evitar duplicación
-        showMoreTendenciasButton.dataset.eventAdded = 'true';
+            // Añadimos la película al arreglo de películas mostradas
+            peliculasLimitadas.push(movie.id);
+          });
+        } else {
+          console.warn('No se encontraron películas para mostrar.');
+        }
+      } catch (error) {
+        console.error('Error al obtener películas de la API de tendencias:', error);
       }
 
-      // Acción al hacer clic en "Ver menos" para ocultar el grid de tendencias
-      showLessTendenciasButton.addEventListener('click', ocultarGridTendencias);
-    };
+      // Ocultar los skeletons después de cargar las películas
+      ocultarskeletontendecias();
+    });
 
-    // Llamamos a la función para generar el grid de películas
-    generarGridMoviesTendencias();
+    // Marcar que el evento ha sido agregado para evitar duplicación
+    showMoreTendenciasButton.dataset.eventAdded = 'true';
+  }
 
+  // Acción al hacer clic en "Ver menos" para ocultar el grid de tendencias
+  showLessTendenciasButton.addEventListener('click', ocultarGridTendencias);
+};
 
-    setTimeout(() => {
-      const banner = document.getElementById('banner');
-      banner.classList.remove('skeleton');
-      banner.querySelector('.hero-container').classList.remove('d-none');
-    }, 2000);
-
-
-    // Variable para mostrar peliculas ya mostrada populares
-    let peliculasMostradasPopulares = [];
-
-    // Mostrar grid populares
-    const mostrarGridPopulares = () => {
-      // Ocultamos las secciónes y los sliders
-      bannerSection.classList.add('d-none');
-      tendenciasSection.classList.add('d-none');
-      proximamenteSection.classList.add('d-none');
-      categoryGridSection.classList.add('d-none');
-      movieSliders.forEach(slider => slider.classList.add('d-none'));
-
-      // Mostrar gridPopulares
-      gridPopularesSection.classList.remove('d-none');
-
-      // Mostramos el botón de "Volver"
-      showlesspopulareButton.classList.remove('d-none');
-    };
-
-    // Ocultar grid Populares
-    const ocultarGridPopulares = () => {
-      // Volvemos a mostrar las secciones
-      bannerSection.classList.remove('d-none');
-      tendenciasSection.classList.remove('d-none')
-      proximamenteSection.classList.remove('d-none')
-      categoryGridSection.classList.add('d-none');
-
-      // Volvemos a mostrar todos los sliders de películas
-      movieSliders.forEach(slider => slider.classList.remove('d-none'));
-
-      // Ocultamos el grid de Populares
-      gridPopularesSection.classList.add('d-none');
-
-      // Ocultamos el botón de "Volver"
-      showlesspopulareButton.classList.add('d-none');
-
-    };
-
-    // Función para mostrar los skeletons antes de cargar las películas
-    const mostrarSkeletonspopulares = () => {
-      const moviesContainer = gridPopularesSection.querySelector('.movies-grid-container-popular');
-      for (let i = 0; i < 20; i++) { // Cambia 20 por el número deseado de skeletons
-        const skeleton = document.createElement('div');
-        skeleton.classList.add('loading-card-grid');
-        moviesContainer.appendChild(skeleton);  // Añadir los skeletons al contenedor principal
-      }
-
-    };
-
-    // Función para ocultar los skeleton después de que las películas cargen 
-    const ocultarSkeletonspopulares = () => {
-      const moviesContainer = gridPopularesSection.querySelector('.movies-grid-container-popular');
-      const skeletons = moviesContainer.querySelectorAll('.loading-card-grid');
-      skeletons.forEach(skeleton => skeleton.remove());
-
-    };
-
-    // Función para generar el grid de películas
-    const generarGridMoviesPopulares = () => {
-      // Añadir el evento solo una vez
-      if (!showmorepopularButton.dataset.eventAdded) {
-        showmorepopularButton.addEventListener('click', async function () {
-          // Mostrar grid populares
-          mostrarGridPopulares();
-
-          // Mostrar skeletons antes de hacer la solicitud
-          mostrarSkeletonspopulares();
-
-          try {
-            // Hacemos la petición de películas
-            let response = await api('/movie/popular', { params: { language: 'es' } });
-
-            // Si no hay resultados en español, intentamos obetnerlos en inglés
-            if (!response.data.results || response.data.results.length === 0) {
-              response = await api('/movie/popular', { params: { language: 'en-US' } });
-            }
+// Llamamos a la función para generar el grid de películas
+generarGridMoviesTendencias();
 
 
-            // Verificamos si la respuesta contiene películas
-            if (response.data.results && response.data.results.length > 0) {
-              // Tomamos solo las 20 primeras películas que no estén ya mostradas
-              const peliculasNuevas = response.data.results.filter(movie => !peliculasMostradasPopulares.includes(movie.id));
+setTimeout(() => {
+  const banner = document.getElementById('banner');
+  banner.classList.remove('skeleton');
+  banner.querySelector('.hero-container').classList.remove('d-none');
+}, 2000);
 
 
-              // Limitamos a 20 películas nuevas
-              const peliculasLimitadas = peliculasNuevas.slice(0, 20);
+// Variable para mostrar peliculas ya mostrada populares
+let peliculasMostradasPopulares = [];
 
-              // Agregar películas limitadas al contenedor
-              peliculasLimitadas.forEach(movie => {
-                const movieCard = document.createElement('div');
-                movieCard.classList.add('movie-card');
+// Mostrar grid populares
+const mostrarGridPopulares = () => {
+  // Ocultamos las secciónes y los sliders
+  bannerSection.classList.add('d-none');
+  tendenciasSection.classList.add('d-none');
+  proximamenteSection.classList.add('d-none');
+  categoryGridSection.classList.add('d-none');
+  movieSliders.forEach(slider => slider.classList.add('d-none'));
 
-                movieCard.innerHTML = ` 
+  // Mostrar gridPopulares
+  gridPopularesSection.classList.remove('d-none');
+
+  // Mostramos el botón de "Volver"
+  showlesspopulareButton.classList.remove('d-none');
+};
+
+// Ocultar grid Populares
+const ocultarGridPopulares = () => {
+  // Volvemos a mostrar las secciones
+  bannerSection.classList.remove('d-none');
+  tendenciasSection.classList.remove('d-none')
+  proximamenteSection.classList.remove('d-none')
+  categoryGridSection.classList.add('d-none');
+
+  // Volvemos a mostrar todos los sliders de películas
+  movieSliders.forEach(slider => slider.classList.remove('d-none'));
+
+  // Ocultamos el grid de Populares
+  gridPopularesSection.classList.add('d-none');
+
+  // Ocultamos el botón de "Volver"
+  showlesspopulareButton.classList.add('d-none');
+
+};
+
+// Función para mostrar los skeletons antes de cargar las películas
+const mostrarSkeletonspopulares = () => {
+  const moviesContainer = gridPopularesSection.querySelector('.movies-grid-container-popular');
+  for (let i = 0; i < 20; i++) { // Cambia 20 por el número deseado de skeletons
+    const skeleton = document.createElement('div');
+    skeleton.classList.add('loading-card-grid');
+    moviesContainer.appendChild(skeleton);  // Añadir los skeletons al contenedor principal
+  }
+
+};
+
+// Función para ocultar los skeleton después de que las películas cargen 
+const ocultarSkeletonspopulares = () => {
+  const moviesContainer = gridPopularesSection.querySelector('.movies-grid-container-popular');
+  const skeletons = moviesContainer.querySelectorAll('.loading-card-grid');
+  skeletons.forEach(skeleton => skeleton.remove());
+
+};
+
+// Función para generar el grid de películas
+const generarGridMoviesPopulares = () => {
+  // Añadir el evento solo una vez
+  if (!showmorepopularButton.dataset.eventAdded) {
+    showmorepopularButton.addEventListener('click', async function () {
+      // Mostrar grid populares
+      mostrarGridPopulares();
+
+      // Mostrar skeletons antes de hacer la solicitud
+      mostrarSkeletonspopulares();
+
+      try {
+        // Hacemos la petición de películas
+        let response = await api('/movie/popular', { params: { language: 'es' } });
+
+        // Si no hay resultados en español, intentamos obetnerlos en inglés
+        if (!response.data.results || response.data.results.length === 0) {
+          response = await api('/movie/popular', { params: { language: 'en-US' } });
+        }
+
+
+        // Verificamos si la respuesta contiene películas
+        if (response.data.results && response.data.results.length > 0) {
+          // Tomamos solo las 20 primeras películas que no estén ya mostradas
+          const peliculasNuevas = response.data.results.filter(movie => !peliculasMostradasPopulares.includes(movie.id));
+
+
+          // Limitamos a 20 películas nuevas
+          const peliculasLimitadas = peliculasNuevas.slice(0, 20);
+
+          // Agregar películas limitadas al contenedor
+          peliculasLimitadas.forEach(movie => {
+            const movieCard = document.createElement('div');
+            movieCard.classList.add('movie-card');
+
+            movieCard.innerHTML = ` 
                  <img src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
                  <h5>${movie.title}</h5>
                 `;
 
-                // Evita el scroll automático al cambiar el hash
-                movieCard.addEventListener('click', () => {
-                  history.pushState(null, '', '#movie' + movie.id);
-                });
+            // Evita el scroll automático al cambiar el hash
+            movieCard.addEventListener('click', () => {
+              history.pushState(null, '', '#movie' + movie.id);
+            });
 
-                // Añadimos la tarjeta de la película al contenedor
-                const moviesContainer = gridPopularesSection.querySelector('.movies-grid-container-popular');
-                moviesContainer.appendChild(movieCard);
+            // Añadimos la tarjeta de la película al contenedor
+            const moviesContainer = gridPopularesSection.querySelector('.movies-grid-container-popular');
+            moviesContainer.appendChild(movieCard);
 
-                // 👉 Agregar el ID a la lista de ya mostradas
-                peliculasMostradasPopulares.push(movie.id);
-              });
-            } else {
-              console.warn('No se encontraron películas para mostrar.');
-            }
-          } catch (error) {
-            console.error('Error al obtener películas de la API de populare:', error);
+            // 👉 Agregar el ID a la lista de ya mostradas
+            peliculasMostradasPopulares.push(movie.id);
+          });
+        } else {
+          console.warn('No se encontraron películas para mostrar.');
+        }
+      } catch (error) {
+        console.error('Error al obtener películas de la API de populare:', error);
 
-          }
-
-          // Ocultar los skeletons después de cargar las películas
-          ocultarSkeletonspopulares();
-        });
-
-        // Marcar que el evento ha sido agregado para evitar duplicación
-        showmorepopularButton.dataset.eventAdded = 'true';
       }
 
-      showlesspopulareButton.addEventListener('click', ocultarGridPopulares);
+      // Ocultar los skeletons después de cargar las películas
+      ocultarSkeletonspopulares();
+    });
 
-    };
+    // Marcar que el evento ha sido agregado para evitar duplicación
+    showmorepopularButton.dataset.eventAdded = 'true';
+  }
 
-    // Llamamos a la función para generar el grid de películas
-    generarGridMoviesPopulares();
+  showlesspopulareButton.addEventListener('click', ocultarGridPopulares);
 
-    // Variable para mostrar peliculas ya mostrada proximamente
-    let peliculasMostradasProximamente = [];
+};
 
-    // Mostrar gridProximamente
-    const mostrarGridProximamente = () => {
-      // Ocultamos las secciónes y los sliders
-      bannerSection.classList.add('d-none');
-      tendenciasSection.classList.add('d-none');
-      popularesSection.classList.add('d-none');
-      categoryGridSection.classList.add('d-none');
-      movieSliders.forEach(slider => slider.classList.add('d-none'));
+// Llamamos a la función para generar el grid de películas
+generarGridMoviesPopulares();
 
-      // Mostrar gridProximamente
-      gridProximamenteSection.classList.remove('d-none')
+// Variable para mostrar peliculas ya mostrada proximamente
+let peliculasMostradasProximamente = [];
 
+// Mostrar gridProximamente
+const mostrarGridProximamente = () => {
+  // Ocultamos las secciónes y los sliders
+  bannerSection.classList.add('d-none');
+  tendenciasSection.classList.add('d-none');
+  popularesSection.classList.add('d-none');
+  categoryGridSection.classList.add('d-none');
+  movieSliders.forEach(slider => slider.classList.add('d-none'));
 
-      // Mostramos el botón de "Volver"
-      showlessproximamenteButton.classList.remove('d-none');
-
-    };
-
-
-    // Ocultar grid Proximamente
-    const ocultarProximamente = () => {
-      // Volvemos a mostrar las secciones
-      bannerSection.classList.remove('d-none');
-      tendenciasSection.classList.remove('d-none');
-      popularesSection.classList.remove('d-none');
-      categoryGridSection.classList.add('d-none');
-
-      // Volvemos a mostrar todos los sliders de películas
-      movieSliders.forEach(slider => slider.classList.remove('d-none'));
-
-      // Ocultamos el grid de Proximamente
-      gridProximamenteSection.classList.add('d-none');
-
-      // Ocultamos el botón de "Volver"
-      showlessproximamenteButton.classList.add('d-none');
-
-    };
+  // Mostrar gridProximamente
+  gridProximamenteSection.classList.remove('d-none')
 
 
-    // Función para mostrar los skeletons antes de cargar las películas
-    const mostrarSkeletonsproximamnete = () => {
-      const moviesContainer = gridProximamenteSection.querySelector('.movies-grid-container-proximamente');
-      for (let i = 0; i < 20; i++) { // Cambia 20 por el número deseado de skeletons
-        const skeleton = document.createElement('div');
-        skeleton.classList.add('loading-card-grid');
-        moviesContainer.appendChild(skeleton);  // Añadir los skeletons al contenedor principal
-      }
+  // Mostramos el botón de "Volver"
+  showlessproximamenteButton.classList.remove('d-none');
 
-    };
-
-    // Función para ocultar los skeleton después de que las películas cargen 
-    const ocultarSkeletonproximamente = () => {
-      const moviesContainer = gridProximamenteSection.querySelector('.movies-grid-container-proximamente');
-      const skeletons = moviesContainer.querySelectorAll('.loading-card-grid');
-      skeletons.forEach(skeleton => skeleton.remove());
-
-    };
+};
 
 
-    // Función para generar el grid de películas
-    const generarGridMovieProximamente = () => {
-      // Añadir el evento solo una vez
-      if (!showMoreProximamneteButton.dataset.eventAdded) {
-        showMoreProximamneteButton.addEventListener('click', async function () {
-          // Mostrar gridPorximamente
-          mostrarGridProximamente();
+// Ocultar grid Proximamente
+const ocultarProximamente = () => {
+  // Volvemos a mostrar las secciones
+  bannerSection.classList.remove('d-none');
+  tendenciasSection.classList.remove('d-none');
+  popularesSection.classList.remove('d-none');
+  categoryGridSection.classList.add('d-none');
 
-          // Mostrar skeletons antes de hacer la solicitud
-          mostrarSkeletonsproximamnete();
+  // Volvemos a mostrar todos los sliders de películas
+  movieSliders.forEach(slider => slider.classList.remove('d-none'));
 
-          try {
-            // Hacemos la petición de películas 
-            let response = await api('/movie/upcoming', { params: { language: 'es' } });
+  // Ocultamos el grid de Proximamente
+  gridProximamenteSection.classList.add('d-none');
 
-            // Si no hay resultados en español, intentamos obetnerlos en inglés
-            if (!response.data.results && response.data.results.length === 0) {
-              response = await api('/movie/upcoming', { params: { language: 'en-US' } });
-            }
+  // Ocultamos el botón de "Volver"
+  showlessproximamenteButton.classList.add('d-none');
 
-            // Verificamos si la respuesta contiene películas
-            if (response.data.results && response.data.results.length > 0) {
-              // Tomamos solo las 20 primeras películas que no estén ya mostradas
-              const peliculasNuevas = response.data.results.filter(movie => !peliculasMostradasProximamente.includes(movie.id));
+};
 
 
+// Función para mostrar los skeletons antes de cargar las películas
+const mostrarSkeletonsproximamnete = () => {
+  const moviesContainer = gridProximamenteSection.querySelector('.movies-grid-container-proximamente');
+  for (let i = 0; i < 20; i++) { // Cambia 20 por el número deseado de skeletons
+    const skeleton = document.createElement('div');
+    skeleton.classList.add('loading-card-grid');
+    moviesContainer.appendChild(skeleton);  // Añadir los skeletons al contenedor principal
+  }
 
-              // Limitamos a 20 películas nuevas
-              const peliculasLimitadas = peliculasNuevas.slice(0, 20);
+};
 
-              // Agregar películas limitadas al contenedor
-              peliculasLimitadas.forEach(movie => {
-                const movieCard = document.createElement('div');
-                movieCard.classList.add('movie-card');
+// Función para ocultar los skeleton después de que las películas cargen 
+const ocultarSkeletonproximamente = () => {
+  const moviesContainer = gridProximamenteSection.querySelector('.movies-grid-container-proximamente');
+  const skeletons = moviesContainer.querySelectorAll('.loading-card-grid');
+  skeletons.forEach(skeleton => skeleton.remove());
 
-                movieCard.innerHTML = ` 
+};
+
+
+// Función para generar el grid de películas
+const generarGridMovieProximamente = () => {
+  // Añadir el evento solo una vez
+  if (!showMoreProximamneteButton.dataset.eventAdded) {
+    showMoreProximamneteButton.addEventListener('click', async function () {
+      // Mostrar gridPorximamente
+      mostrarGridProximamente();
+
+      // Mostrar skeletons antes de hacer la solicitud
+      mostrarSkeletonsproximamnete();
+
+      try {
+        // Hacemos la petición de películas 
+        let response = await api('/movie/upcoming', { params: { language: 'es' } });
+
+        // Si no hay resultados en español, intentamos obetnerlos en inglés
+        if (!response.data.results && response.data.results.length === 0) {
+          response = await api('/movie/upcoming', { params: { language: 'en-US' } });
+        }
+
+        // Verificamos si la respuesta contiene películas
+        if (response.data.results && response.data.results.length > 0) {
+          // Tomamos solo las 20 primeras películas que no estén ya mostradas
+          const peliculasNuevas = response.data.results.filter(movie => !peliculasMostradasProximamente.includes(movie.id));
+
+
+
+          // Limitamos a 20 películas nuevas
+          const peliculasLimitadas = peliculasNuevas.slice(0, 20);
+
+          // Agregar películas limitadas al contenedor
+          peliculasLimitadas.forEach(movie => {
+            const movieCard = document.createElement('div');
+            movieCard.classList.add('movie-card');
+
+            movieCard.innerHTML = ` 
                   <img src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
                <h5>${movie.title}</h5>
               `;
 
-                // Evita el scroll automático al cambiar el hash
-                movieCard.addEventListener('click', () => {
-                  history.pushState(null, '', '#movie' + movie.id)
-                })
+            // Evita el scroll automático al cambiar el hash
+            movieCard.addEventListener('click', () => {
+              history.pushState(null, '', '#movie' + movie.id)
+            })
 
-                // Añadimos la tarjeta de la película al contenedor
-                const moviesContainer = gridProximamenteSection.querySelector('.movies-grid-container-proximamente');
-                moviesContainer.appendChild(movieCard);
+            // Añadimos la tarjeta de la película al contenedor
+            const moviesContainer = gridProximamenteSection.querySelector('.movies-grid-container-proximamente');
+            moviesContainer.appendChild(movieCard);
 
-                // 👉 Agregar el ID a la lista de ya mostradas
-                peliculasMostradasProximamente.push(movie.id);
-              })
-            } else {
-              console.warn('No se encontraron películas para mostrar.');
-            };
-          } catch (error) {
-            console.error('Error al obtener películas de la API de proximamente:', error);
-          }
-
-          // Ocultar los skeletons después de cargar las películas
-          ocultarSkeletonproximamente();
-        })
-
-        // Marcar que el evento ha sido agregado para evitar duplicación
-        showMoreProximamneteButton.dataset.eventAdded = 'true';
+            // 👉 Agregar el ID a la lista de ya mostradas
+            peliculasMostradasProximamente.push(movie.id);
+          })
+        } else {
+          console.warn('No se encontraron películas para mostrar.');
+        };
+      } catch (error) {
+        console.error('Error al obtener películas de la API de proximamente:', error);
       }
 
+      // Ocultar los skeletons después de cargar las películas
+      ocultarSkeletonproximamente();
+    })
 
-      showlessproximamenteButton.addEventListener('click', ocultarProximamente);
+    // Marcar que el evento ha sido agregado para evitar duplicación
+    showMoreProximamneteButton.dataset.eventAdded = 'true';
+  }
 
-    };
+
+  showlessproximamenteButton.addEventListener('click', ocultarProximamente);
+
+};
 
 
-    // Llamamos a la función para generar el grid de películas
-    generarGridMovieProximamente();
+// Llamamos a la función para generar el grid de películas
+generarGridMovieProximamente();
 
 
 
