@@ -14,11 +14,11 @@ const api = axios.create({
 // Creamos el observador con IntersectionObserver para cargar las imágenes al estar cerca al viweport
 const createObserver =  () =>  {
   // Seleccionamos todas las imagenes
-  const img = document.querySelectorAll('img');
+  const img = document.querySelectorAll('img[data-src]');
 
  // Configuración del IntersectionObserver
  const options = {
-     rootMargin: '200px', // Define un margen para el trigger antes de que la imagen entre al viewport
+     rootMargin: '300px', // Define un margen para el trigger antes de que la imagen entre al viewport
      threshold: 0.1,  // Cuando el 10% de la imagen esté visible, se activará el callback
  };
 
@@ -344,119 +344,6 @@ const ocultarskeletoncategory = () => {
   skeletons.forEach(skeleton => skeleton.remove());
 };
 
-// Función para obtener películas por categoría
-const getMoviesCategory = async (id) => {
-  try {
-    const genereMap = {
-      28: 'Acción',
-      12: 'Aventura',
-      16: 'Animación',
-      35: 'Comedia',
-      80: 'Fantasía',
-      99: 'Documental',
-      18: 'Drama',
-      10751: 'Familiar',
-      14: 'Fantasia',
-      36: 'Historia',
-      27: 'Terror',
-      10402: 'Música',
-      9648: 'Misterio',
-      10749: 'Romance',
-      878: 'Ciencia ficción',
-      10770: 'Película de tv',
-      53: 'Suspenso',
-      10752: 'Bélica',
-      37: 'Western',
-    };
-
-    // Si el ID no está en el mapa, salimos silenciosamente
-    if (!genereMap[id]) return;
-
-    // Mostrar sección y skeletons
-    const categoryGridSection = document.getElementById('category-grid-container');
-    categoryGridSection.classList.remove('d-none');
-
-    const moviesContainer = categoryGridSection.querySelector('.movies-grid-container-category');
-    moviesContainer.innerHTML = '';
-    mostrarSkeletoncategory();
-
-    // Ocultar otras secciones
-    bannerSection.classList.add('d-none');
-    popularesSection.classList.add('d-none');
-    tendenciasSection.classList.add('d-none');
-    proximamenteSection.classList.add('d-none');
-    movieSliders.forEach(slider => slider.classList.add('d-none'));
-
-    // Función auxiliar para buscar por idioma
-    const fetchByLanguage = async (lang) => {
-      const response = await api('discover/movie', {
-        params: {
-          with_genres: id,
-          with_original_language: lang,
-        },
-      });
-      return response.data.results || [];
-    };
-
-    // Buscar películas en español e inglés al mismo tiempo
-    const [pelisEs, pelisEN] = await Promise.all([
-      fetchByLanguage('es'),
-      fetchByLanguage('en'),
-    ]);
-
-    const allMovies = [...pelisEs, ...pelisEN];
-    if (allMovies.length === 0) throw new Error('No se encontraron películas');
-
-    // Cambiar título de la categoría
-    const categoryTitle = document.querySelector('.grid-category-title');
-    categoryTitle.textContent = `Películas por categoría: ${genereMap[id]}`;
-
-    // Ocultar skeletons y mostrar películas
-    ocultarskeletoncategory();
-    moviesContainer.innerHTML = '';
-
-    allMovies.forEach(movie => {
-      const movieCard = document.createElement('div');
-      movieCard.classList.add('movie-card');
-      movieCard.innerHTML = ` 
-        <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}">
-        <h5>${movie.title}</h5>
-        <a href="https://www.themoviedb.org/movie/${movie.id}" target="_blank"></a>
-      `;
-      movieCard.addEventListener('click', () => {
-        history.pushState(null, '', '#movie' + movie.id);
-      });
-      moviesContainer.appendChild(movieCard);
-    });
-
-    // Mostrar botón "Ver menos"
-    const showLessCategoryGridButton = document.getElementById('show-less-category-grid');
-    showLessCategoryGridButton.classList.remove('d-none');
-
-    showLessCategoryGridButton.onclick = () => {
-      bannerSection.classList.remove('d-none');
-      popularesSection.classList.remove('d-none');
-      proximamenteSection.classList.remove('d-none');
-      categoryGridSection.classList.remove('d-none');
-      movieSliders.forEach(slider => slider.classList.remove('d-none'));
-      showLessCategoryGridButton.classList.add('d-none');
-      location.hash = '';
-    };
-
-  } catch (error) {
-    console.error('Error al cargar películas por categoría:', error);
-    ocultarskeletoncategory();
-
-    const categoryGridSection = document.getElementById('category-grid-container');
-    const moviesContainer = categoryGridSection.querySelector('.movies-grid-container-category');
-    moviesContainer.innerHTML = '';
-    const errorMessage = document.createElement('div');
-    errorMessage.classList.add('error-mensage');
-    errorMessage.textContent = 'Lo siento, no pudimos cargar las películas en este momento';
-    moviesContainer.appendChild(errorMessage);
-  }
-};
-
 // Función asincrona para obetener la pelicula según su búsqueda
 const getMoviesSearch = async (query) => {
   try {
@@ -487,9 +374,12 @@ const getMoviesSearch = async (query) => {
 
 
       movieElement.innerHTML = `
-           <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" class="img-fluid rounded">
+           <img data-src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" class="img-fluid rounded">
            <h5>${movie.title}</h5>
           `;
+
+        // Invocamos el observador 
+        createObserver();
 
       // Asegúrate de que el evento esté en el movieElement
       movieElement.addEventListener('click', () => {
@@ -576,7 +466,120 @@ homeBtn.addEventListener('click', () => {
 
 
 
+// Función para obtener películas por categoría
+const getMoviesCategory = async (id) => {
+  try {
+    const genereMap = {
+      28: 'Acción',
+      12: 'Aventura',
+      16: 'Animación',
+      35: 'Comedia',
+      80: 'Fantasía',
+      99: 'Documental',
+      18: 'Drama',
+      10751: 'Familiar',
+      14: 'Fantasia',
+      36: 'Historia',
+      27: 'Terror',
+      10402: 'Música',
+      9648: 'Misterio',
+      10749: 'Romance',
+      878: 'Ciencia ficción',
+      10770: 'Película de tv',
+      53: 'Suspenso',
+      10752: 'Bélica',
+      37: 'Western',
+    };
 
+    // Si el ID no está en el mapa, salimos silenciosamente
+    if (!genereMap[id]) return;
+
+    // Mostrar sección y skeletons
+    const categoryGridSection = document.getElementById('category-grid-container');
+    categoryGridSection.classList.remove('d-none');
+
+    const moviesContainer = categoryGridSection.querySelector('.movies-grid-container-category');
+    moviesContainer.innerHTML = '';
+    mostrarSkeletoncategory();
+
+    // Ocultar otras secciones
+    bannerSection.classList.add('d-none');
+    popularesSection.classList.add('d-none');
+    tendenciasSection.classList.add('d-none');
+    proximamenteSection.classList.add('d-none');
+    movieSliders.forEach(slider => slider.classList.add('d-none'));
+
+    // Función auxiliar para buscar por idioma
+    const fetchByLanguage = async (lang) => {
+      const response = await api('discover/movie', {
+        params: {
+          with_genres: id,
+          with_original_language: lang,
+        },
+      });
+      return response.data.results || [];
+    };
+
+    // Buscar películas en español e inglés al mismo tiempo
+    const [pelisEs, pelisEN] = await Promise.all([
+      fetchByLanguage('es'),
+      fetchByLanguage('en'),
+    ]);
+
+    const allMovies = [...pelisEs, ...pelisEN];
+    if (allMovies.length === 0) throw new Error('No se encontraron películas');
+
+    // Cambiar título de la categoría
+    const categoryTitle = document.querySelector('.grid-category-title');
+    categoryTitle.textContent = `Películas por categoría: ${genereMap[id]}`;
+
+    // Ocultar skeletons y mostrar películas
+    ocultarskeletoncategory();
+    moviesContainer.innerHTML = '';
+
+    allMovies.forEach(movie => {
+      const movieCard = document.createElement('div');
+      movieCard.classList.add('movie-card');
+      movieCard.innerHTML = ` 
+        <img data-src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}">
+        <h5>${movie.title}</h5>
+        <a href="https://www.themoviedb.org/movie/${movie.id}" target="_blank"></a>
+      `;
+      movieCard.addEventListener('click', () => {
+        history.pushState(null, 'òijh', '#movie' + movie.id);
+      });
+      moviesContainer.appendChild(movieCard);
+    });
+    // 🔥 Llamamos a createObserver después de agregar las imágenes dinámicamente
+    createObserver();
+
+    // Mostrar botón "Ver menos"
+    const showLessCategoryGridButton = document.getElementById('show-less-category-grid');
+    showLessCategoryGridButton.classList.remove('d-none');
+
+    showLessCategoryGridButton.onclick = () => {
+      bannerSection.classList.remove('d-none');
+      popularesSection.classList.remove('d-none');
+      proximamenteSection.classList.remove('d-none');
+      categoryGridSection.classList.remove('d-none');
+      movieSliders.forEach(slider => slider.classList.remove('d-none'));
+      showLessCategoryGridButton.classList.add('d-none');
+      location.hash = '';
+    };
+
+  } catch (error) {
+    console.error('Error al cargar películas por categoría:', error);
+    ocultarskeletoncategory();
+
+    const categoryGridSection = document.getElementById('category-grid-container');
+    const moviesContainer = categoryGridSection.querySelector('.movies-grid-container-category');
+    moviesContainer.innerHTML = '';
+    const errorMessage = document.createElement('div');
+    errorMessage.classList.add('error-mensage');
+    errorMessage.textContent = 'Lo siento, no pudimos cargar las películas en este momento';
+    moviesContainer.appendChild(errorMessage);
+  }
+};
 
 
 let visibleSectionBeforeDetail = null; // Para recordar la seccion estaba visiible antes de entrar en datalles
@@ -669,13 +672,16 @@ const showMovieDetail = async (movie) => {
 
   // Mostrar info
   movieBackground.style.backgroundImage = `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`;
-  moviePoster.innerHTML = `<img src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">`;
+  moviePoster.innerHTML = `<img data-src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">`;
   movieTitle.textContent = movie.title;
   movieDescription.textContent = movie.overview || 'Descripción no disponible.';
   movieReleaseDate.textContent = `Fecha de estreno: ${movie.release_date || 'N/A'}`;
 
   // Llamar a la nueva función para géneros y recomendaciones
   await fetchGenresAndRecommendations(movie.id);
+
+  // 🔥 Llamamos a createObserver después de agregar las imágenes dinámicamente
+  createObserver();
 
 
   // Mostrar botón correspondiente
@@ -782,7 +788,7 @@ const fetchGenresAndRecommendations = async (id) => {
         card.style.width = '100%';
 
         card.innerHTML = `
-           <img src="https://image.tmdb.org/t/p/original${rec.poster_path}" alt="${rec.title}" class="img-fluid rounded mb-2" style="height: 300px; object-fit: cover;">
+           <img data-src="https://image.tmdb.org/t/p/original${rec.poster_path}" alt="${rec.title}" class="img-fluid rounded mb-2" style="height: 300px; object-fit: cover;">
            <h5 class="text-truncate" title="${rec.title}">${rec.title}</h5>
           `;
 
@@ -792,6 +798,9 @@ const fetchGenresAndRecommendations = async (id) => {
       });
 
       similaresContainer.appendChild(row);
+
+      // 🔥 Llamamos a createObserver después de agregar las imágenes dinámicamente
+      createObserver();
 
     }
 
@@ -888,7 +897,7 @@ const generarGridMoviesTendencias = () => {
             movieCard.classList.add('movie-card'); // Aplicamos la clase movie-card-grid
 
             movieCard.innerHTML = `
-              <img src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
+              <img data-src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
               <h5>${movie.title}</h5>
             `;
 
@@ -913,6 +922,9 @@ const generarGridMoviesTendencias = () => {
 
       // Ocultar los skeletons después de cargar las películas
       ocultarskeletontendecias();
+
+      // 🔥 Llamamos a createObserver después de agregar las imágenes dinámicamente
+      createObserver();
     });
 
     // Marcar que el evento ha sido agregado para evitar duplicación
@@ -1027,7 +1039,7 @@ const generarGridMoviesPopulares = () => {
             movieCard.classList.add('movie-card');
 
             movieCard.innerHTML = ` 
-                 <img src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
+                 <img data-src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
                  <h5>${movie.title}</h5>
                 `;
 
@@ -1053,6 +1065,9 @@ const generarGridMoviesPopulares = () => {
 
       // Ocultar los skeletons después de cargar las películas
       ocultarSkeletonspopulares();
+
+      // 🔥 Llamamos a createObserver después de agregar las imágenes dinámicamente
+      createObserver();
     });
 
     // Marcar que el evento ha sido agregado para evitar duplicación
@@ -1164,7 +1179,7 @@ const generarGridMovieProximamente = () => {
             movieCard.classList.add('movie-card');
 
             movieCard.innerHTML = ` 
-                  <img src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
+                  <img data-src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
                <h5>${movie.title}</h5>
               `;
 
@@ -1189,6 +1204,9 @@ const generarGridMovieProximamente = () => {
 
       // Ocultar los skeletons después de cargar las películas
       ocultarSkeletonproximamente();
+
+      // 🔥 Llamamos a createObserver después de agregar las imágenes dinámicamente
+      createObserver();
     })
 
     // Marcar que el evento ha sido agregado para evitar duplicación
