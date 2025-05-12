@@ -12,40 +12,40 @@ const api = axios.create({
 })
 
 // Creamos el observador con IntersectionObserver para cargar las imágenes al estar cerca al viweport
-const createObserver =  () =>  {
+const createObserver = () => {
   // Seleccionamos todas las imagenes
   const img = document.querySelectorAll('img[data-src]');
 
- // Configuración del IntersectionObserver
- const options = {
-     rootMargin: '300px', // Define un margen para el trigger antes de que la imagen entre al viewport
-     threshold: 0.1,  // Cuando el 10% de la imagen esté visible, se activará el callback
- };
+  // Configuración del IntersectionObserver
+  const options = {
+    rootMargin: '300px', // Define un margen para el trigger antes de que la imagen entre al viewport
+    threshold: 0.1,  // Cuando el 10% de la imagen esté visible, se activará el callback
+  };
 
- // Callback que se ejecuta cuando la imágen entra en el área visible
- const callback = (entries, observer) => {
-   entries.forEach(entry => {
-       // Si la imagen esta visible
-       if (entry.isIntersecting) {
-         const img = entry.target;
-         const dataSrc = img.dataset.src; // Obtiene el data-src;
+  // Callback que se ejecuta cuando la imágen entra en el área visible
+  const callback = (entries, observer) => {
+    entries.forEach(entry => {
+      // Si la imagen esta visible
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        const dataSrc = img.dataset.src; // Obtiene el data-src;
 
-         // Carga la imagen y elimina el data-src
+        // Carga la imagen y elimina el data-src
         if (dataSrc) {
           img.src = dataSrc;
           img.removeAttribute('data-src');
         }
 
-          // Deja de observar la imágen 
-          observer.unobserve(img);
-       }
-   })
- };
+        // Deja de observar la imágen 
+        observer.unobserve(img);
+      }
+    })
+  };
 
- // Crea y comienza a observar las imágenes
- const observer = new IntersectionObserver(callback, options);
+  // Crea y comienza a observar las imágenes
+  const observer = new IntersectionObserver(callback, options);
 
- img.forEach(img => observer.observe(img)); 
+  img.forEach(img => observer.observe(img));
 
 };
 
@@ -158,8 +158,8 @@ const getPopularMovie = async () => {
       // Agregar la tarjeta de cada película al contenedor
       movieContainer.appendChild(movieCard);
 
-       // 🔥 Llamamos a createObserver después de agregar las imágenes dinámicamente
-       createObserver();
+      // 🔥 Llamamos a createObserver después de agregar las imágenes dinámicamente
+      createObserver();
     });
 
   } catch (error) {
@@ -168,9 +168,6 @@ const getPopularMovie = async () => {
 };
 
 getPopularMovie();
-
-
-
 
 const getTredingMovies = async () => {
   // Buscar el contenedor donde se muestran las peliculas
@@ -218,17 +215,14 @@ const getTredingMovies = async () => {
       // Agregar la tarjeta de cada película al contenedor
       movieContainer.appendChild(movieCard);
 
-        // 🔥 Llamamos a createObserver después de agregar las imágenes dinámicamente
-        createObserver();
+      // 🔥 Llamamos a createObserver después de agregar las imágenes dinámicamente
+      createObserver();
     });
 
   } catch (error) {
     console.error('Ocurrió un problema:', error); // Si ocurrió un error mostrarlo en la consola
   }
 };
-
-
-
 
 // Función asíncrona para mostrar las categorías de las películas
 const getCategoriesPreview = async () => {
@@ -309,7 +303,6 @@ menuToggle.addEventListener('click', (event) => {
 
 });
 
-
 // Evitar que el menú se oculte mientras el mouse esté sobre él
 categoryList.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
 categoryList.addEventListener('mouseleave', hideMenu);
@@ -344,10 +337,10 @@ const ocultarskeletoncategory = () => {
   skeletons.forEach(skeleton => skeleton.remove());
 };
 
-// Función asincrona para obetener la pelicula según su búsqueda
+// Función asincrona para obtener la película según su búsqueda
 const getMoviesSearch = async (query) => {
-  try {
 
+  try {
     const { data } = await api('/search/movie', {
       params: { query }
     });
@@ -356,85 +349,78 @@ const getMoviesSearch = async (query) => {
     const container = document.querySelector('#search-section .container');
     const title = document.querySelector('.search-title');
 
-    // Limpiar el contenido anterior
-    container.innerHTML = '';
 
-    // Limpiar otros títulos si hay
-    const gridTitle = document.querySelector('.gird-category-title');
-    if (gridTitle) gridTitle.textContent = '';
+    // Limpiar el contenido anterior
+    container.innerHTML = ``;
+
+    // Limpiar otros titulos si hay 
+    const gridTitlte = document.querySelector('.grid-category-title');
+    if (gridTitlte) gridTitlte.textContent = '';
 
     // Ocultar otras secciones
     if (categoryGridSection) categoryGridSection.classList.add('d-none');
 
+    // Procesar cada película
     movies.forEach(movie => {
       if (!movie.poster_path) return;
 
       const movieElement = document.createElement('div');
       movieElement.classList.add('movie-card', 'mb-4');
 
+      const imgElement = document.createElement('img');
+      imgElement.classList.add('img-fluid', 'rounded');
+      imgElement.setAttribute('src', `https://image.tmdb.org/t/p/w500${movie.poster_path}`); // Intenta cargar la imagen real
+      imgElement.onerror = () => { // En caso de error, establece la imagen por defecto
+        imgElement.setAttribute('src', 'img/Brak OBRAZU.png');
+      }
 
-      movieElement.innerHTML = `
-           <img data-src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" class="img-fluid rounded">
-           <h5>${movie.title}</h5>
-          `;
+      movieElement.innerHTML = ` 
+       <h5>${movie.title}</h5>
+      `;
 
-        // Invocamos el observador 
-        createObserver();
+      movieElement.prepend(imgElement);  // Añadir la imagen antes del título
 
-      // Asegúrate de que el evento esté en el movieElement
+      // Llamamos a createObserver después de agregar las imágenes dinámicamente
+      createObserver();
+
+      // Añadir evento de clic para redigir
       movieElement.addEventListener('click', () => {
-        history.pushState(null, '', '#movie' + movie.id);
+        history.pushState(null, '', `#movie=${movie.id}`);
+
       });
 
-
+      // Añadir el elemnto de la película la contendor
       container.appendChild(movieElement);
     });
 
-    // Ocultar el home y demas secciones
+    // Ocultar el home  y demás secciónes
     bannerSection.classList.add('d-none');
     tendenciasSection.classList.add('d-none');
     popularesSection.classList.add('d-none');
     proximamenteSection.classList.add('d-none');
 
-    // Mostar la seccion de búsqueda
+    // Mostrar la sección de búsqueda
     searchSection.classList.remove('d-none');
 
-    // Cambiamos el titulo de lo que buscamos
+    // Cambiar el titulo de lo que búscamos
     title.textContent = decodeURIComponent(query);
 
-    // Mostrar solo el botón de volver
+    // Mostrar solo el bóton de volver
     toggleButtonsVisibility('back');
   } catch (error) {
     console.error('Error al buscar películas:', error);
   }
-
 };
 
-// Función para la ocultación y visibilicación de secciones
-const mostrarSolo = (secction) => {
-  // Ocultar todas las secction
-  bannerSection.classList.add('d-none');
-  tendenciasSection.classList.add('d-none');
-  popularesSection.classList.add('d-none');
-  proximamenteSection.classList.add('d-none');
-  categoryGridSection.classList.add('d-none');
-
-  // Mostrar la sección deseada
-  secction.classList.remove('d-none');
-
-};
-
-// Función para ocultar o mostrar los botones según la seccion
+// Función para ocultar o mostrar los bótones según la seccíon
 const toggleButtonsVisibility = (buttonType) => {
   const backBtn = document.getElementById('back-btn');
   const homeBtn = document.getElementById('home-btn');
 
   if (buttonType === 'back') {
-    // Mostrar solo el botón de "Volver"
     backBtn.classList.remove('d-none');
     homeBtn.classList.add('d-none');
   } else if (buttonType === 'home') {
-    // Mostrar solo el botón de "Volver al Home"
     backBtn.classList.add('d-none');
     homeBtn.classList.remove('d-none');
   }
@@ -444,25 +430,22 @@ const toggleButtonsVisibility = (buttonType) => {
 const volverBtn = document.getElementById('back-btn');
 volverBtn.addEventListener('click', () => {
   // Simula el clic del botón de atrás del navegador
-  window.history.back(); // Retrocede la página sin borrar el contenido
-
+  window.history.back();
 });
 
-// Función para "Volver al Home"
+// Función para volver al home
 const homeBtn = document.getElementById('home-btn');
 homeBtn.addEventListener('click', () => {
-  // Mostrar todas las secciones del Home y ocultar la sección de búsqueda
-  bannerSection.classList.remove('d-none');
+  // Mostrar todas las secciónes del home y ocultar la sección de búsqueda
+  bannerSection.classList.remove('d-none')
   tendenciasSection.classList.remove('d-none');
   popularesSection.classList.remove('d-none');
-  proximamenteSection.classList.remove('d-none');
-  searchSection.classList.add('d-none'); // Ocultar la sección de búsqueda
+  searchSection.classList.add('d-none');
 
-  // Mostrar solo el botón de "Volver al Home"
+  // Mostrar solo el botón de 'Volver al Home'
   toggleButtonsVisibility('home');
+
 });
-
-
 
 
 
@@ -529,28 +512,51 @@ const getMoviesCategory = async (id) => {
     const allMovies = [...pelisEs, ...pelisEN];
     if (allMovies.length === 0) throw new Error('No se encontraron películas');
 
-    // Cambiar título de la categoría
+    // Cambiar el titulo de la categoría
     const categoryTitle = document.querySelector('.grid-category-title');
-    categoryTitle.textContent = `Películas por categoría: ${genereMap[id]}`;
+    categoryTitle.textContent = `Películas por categoría ${genereMap[id]}`;
 
-    // Ocultar skeletons y mostrar películas
+    // Ocultar los skeletons  y mostrar películas
     ocultarskeletoncategory();
     moviesContainer.innerHTML = '';
 
-    allMovies.forEach(movie => {
+     allMovies.forEach(movie => {
+      // Crear el elemento de imagen con manejo de error
+      const imgElement = document.createElement('img');
+      imgElement.classList.add('img-fluid', 'rounded');
+      imgElement.setAttribute('src', `https://image.tmdb.org/t/p/w500${movie.poster_path}`);
+
+      // Si la imagen falla, se carga una imagen por defecto
+      imgElement.onerror = () => {
+        imgElement.setAttribute('src', 'img/Brak OBRAZU.png');
+      };
+
+       // Crear el título de la película
+       const movieTitle = document.createElement('h5');
+       movieTitle.textContent = movie.title;
+
+      // Crear el enlace a la página de la película
+      const movieLink = document.createElement('a');
+      movieLink.href = `https://www.themoviedb.org/movie/${movie.id}`;
+      movieLink.target = '_black';
+
+      // Crea la targeta de película y añadir elementos
       const movieCard = document.createElement('div');
       movieCard.classList.add('movie-card');
-      movieCard.innerHTML = ` 
-        <img data-src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}">
-        <h5>${movie.title}</h5>
-        <a href="https://www.themoviedb.org/movie/${movie.id}" target="_blank"></a>
-      `;
+      movieCard.appendChild(imgElement);
+      movieCard.appendChild(movieTitle);
+      movieCard.appendChild(movieLink);
+
+      // Agregar el evento de clic para el historial
       movieCard.addEventListener('click', () => {
         history.pushState(null, 'òijh', '#movie' + movie.id);
       });
-      moviesContainer.appendChild(movieCard);
+
+       // Añadir la tarjeta de película al contenedor
+       moviesContainer.appendChild(movieCard);
     });
-    // 🔥 Llamamos a createObserver después de agregar las imágenes dinámicamente
+
+    // Llamamos createOberserver después de agregar las imágenes dinámicamente
     createObserver();
 
     // Mostrar botón "Ver menos"
@@ -559,15 +565,15 @@ const getMoviesCategory = async (id) => {
 
     showLessCategoryGridButton.onclick = () => {
       bannerSection.classList.remove('d-none');
-      popularesSection.classList.remove('d-none');
+      tendenciasSection.classList.remove('d-none');
       proximamenteSection.classList.remove('d-none');
       categoryGridSection.classList.remove('d-none');
-      movieSliders.forEach(slider => slider.classList.remove('d-none'));
+      movieSliders.forEach(slider => slider.classList.add('d-none'));
       showLessCategoryGridButton.classList.add('d-none');
       location.hash = '';
     };
 
-  } catch (error) {
+  } catch {
     console.error('Error al cargar películas por categoría:', error);
     ocultarskeletoncategory();
 
@@ -580,6 +586,7 @@ const getMoviesCategory = async (id) => {
     moviesContainer.appendChild(errorMessage);
   }
 };
+
 
 
 let visibleSectionBeforeDetail = null; // Para recordar la seccion estaba visiible antes de entrar en datalles

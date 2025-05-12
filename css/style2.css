@@ -671,7 +671,7 @@ transition: background-color 0.3s ease; /* Transición suave */
 
 @media (max-width: 830px) {
 #category-grid-container .movies-grid-container-category,
-#grid-tendencias .movies-container {
+#grid-tendencias .movies-container-tedencias {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   width: 75%;
@@ -714,7 +714,7 @@ transition: background-color 0.3s ease; /* Transición suave */
 
 @media (max-width: 380px) {
 #category-grid-container .movies-grid-container-category,
-#grid-tendencias .movies-container {
+#grid-tendencias .movies-container-tedencias {
   display: grid;
   grid-template-columns: 1fr;
   width: 50%;
@@ -760,7 +760,7 @@ transition: background-color 0.3s ease; /* Transición suave */
 #category-grid-container .movies-grid-container-category,
 #grid-populares .movies-grid-container-popular,
 #grid-proximamente .movies-grid-container-proximamente,
-#grid-tendencias .movies-grid-container{
+#grid-tendencias .movies-container-tedencias{
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   width: 100%;
