@@ -991,3 +991,9 @@ transition: background-color 0.3s ease; /* Transición suave */
     background-color: #444;
   }
 }
+
+
+footer {
+  position: relative; /* Asegúrate de que el footer esté en el flujo del documento */
+  z-index: 10; /* Asegúrate de que no sea cubierto por otros elementos */
+}
