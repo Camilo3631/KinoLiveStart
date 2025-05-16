@@ -819,7 +819,7 @@ const fetchGenresAndRecommendations = async (id) => {
 
 let peliculasMostradasTendencias = [];
 let paginaActualTendencias = 2; // Empieza en la 2 porque la 1 ya está cargada
-const maxPaginasTendencias = 6;  // Para permitir hasta 100 películas (5 * 20)
+const maxPaginasTendencias = 5;  // Para permitir hasta 100 películas (5 * 20)
 let cargandoPeliculasTendencias = false; // Para evitar cargas simultáneas
 
 let totalPeliculasMostradasTendecias = 0; // Contador total mostrado
@@ -877,7 +877,7 @@ const cargarPeliculasTendecias = async () => {
     }
 
     if (response.data.results && response.data.results.length > 0) {
-      const peliculasNuevasTedencia = response.data.results.filter(movie => !peliculasMostradasTendencias.includes(movie.id));;
+      const peliculasNuevasTedencia = response.data.results.filter(movie => !peliculasMostradasTendencias.includes(movie.id));
       const moviesContainer = gridTendenciasSection.querySelector('.movies-grid-container');
 
       for (const movie of peliculasNuevasTedencia) {
@@ -916,7 +916,7 @@ const scrollHandler = () => {
   if (cargandoPeliculasTendencias) return; // evitar llamadas múltiples
 
   // Comprobar si estamos cerca del final de la página
-  if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 10)) { // Altura del scroll
+  if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 10)) {
     cargarPeliculasTendecias();
   }
 };
@@ -929,7 +929,7 @@ const generarGridMoviesTendencias = () => {
     paginaActualTendencias = 2;
     peliculasMostradasTendencias = [];
     totalPeliculasMostradas = 0;
-    gridTendenciasSection.querySelector('.movies-grid-container');
+    gridTendenciasSection.querySelector('.movies-grid-container').innerHTML = '';
 
     cargarPeliculasTendecias();
   });
@@ -944,7 +944,7 @@ const generarGridMoviesTendencias = () => {
     paginaActualTendencias = 2; // Empieza en la 2 porque la 1 ya está cargada
     peliculasMostradasTendencias = [];
     totalPeliculasMostradas = 0;
-    gridTendenciasSection.querySelector('.movies-grid-container');
+    gridTendenciasSection.querySelector('.movies-grid-container').innerHTML = '';
   });
 };
 
@@ -960,7 +960,7 @@ setTimeout(() => {
 
 let peliculasMostradasPopulares = [];
 let paginaActualPopulares = 2;
-const maxPaginasPopulares = 6;
+const maxPaginasPopulares = 5;
 let cargandoPeliculasPopulares = false;
 
 let totalPeliculasMostradasPopulares = 0;
@@ -1073,9 +1073,9 @@ const scrollHandlerPopulares = () => {
   if (cargandoPeliculasPopulares) return;
 
   const scrollY = window.scrollY;
-  const altura = document.documentElement.scrollHeight - window.innerHeight; // Altura del scroll
+  const altura = document.documentElement.scrollHeight - window.innerHeight;
 
-  if (scrollY >= altura - 10) { // Altura del scroll
+  if (scrollY >= altura - 10) {
     cargarPeliculasPopulares();
   }
 };
@@ -1089,7 +1089,7 @@ const generarGridMoviesPopulares = () => {
     paginaActualPopulares = 2;
     peliculasMostradasPopulares = [];
     totalPeliculasMostradasPopulares = 0;
-    gridPopularesSection.querySelector('.movies-grid-container-popular');
+    gridPopularesSection.querySelector('.movies-grid-container-popular').innerHTML = '';
 
     cargarPeliculasPopulares();
     window.addEventListener('scroll', scrollHandlerPopulares);
@@ -1103,7 +1103,7 @@ const generarGridMoviesPopulares = () => {
     paginaActualPopulares = 2;
     peliculasMostradasPopulares = [];
     totalPeliculasMostradasPopulares = 0;
-    gridPopularesSection.querySelector('.movies-grid-container-popular');
+    gridPopularesSection.querySelector('.movies-grid-container-popular').innerHTML = '';
   });
 };
 
@@ -1113,7 +1113,7 @@ generarGridMoviesPopulares();
 // Variable para mostrar peliculas ya mostrada proximamente
 let peliculasMostradasProximamente = [];
 let paginaActualProximamente = 2;
-const maxPaginasProximamente = 6; // no 5
+const maxPaginasProximamente = 5;
 let cargandoPeliculasProximamente = false;
 
 let totalPeliculasMostradasProximanente = 0;
@@ -1248,9 +1248,9 @@ const scrollHandlerProximamente = () => {
 
      // Resetear datos para una nueva carga
      paginaActualProximamente = 2;
-     peliculasMostradasProximamente = [];
+     paginaActualProximamente = [];
      totalPeliculasMostradasProximanente = 0;
-     gridProximamenteSection.querySelector('.movies-grid-container-proximamente')
+     gridProximamenteSection.querySelector('.movies-grid-container-proximamente').innerHTML = '';
 
      cargarPeliculasProximamente();
      window.addEventListener('scroll', scrollHandlerProximamente);
@@ -1265,23 +1265,14 @@ const scrollHandlerProximamente = () => {
     paginaActualProximamente = 2;
     peliculasMostradasProximamente = [];
     totalPeliculasMostradasProximanente = 0;
-    gridPopularesSection.querySelector('.movies-grid-container-proximamente')
+    gridPopularesSection.querySelector('.movies-grid-container-proximamente').innerHTML = '';
 
   })
  };
 
 generarGridMovieProximamente();
 
-
-
-
-
-
-
-
-
-
-
+          
 
 
 
