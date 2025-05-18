@@ -186,11 +186,11 @@ const getTredingMovies = async () => {
   }
 
   try {
-    let { data } = await api('trending/movie/week', { params: { language: 'es' } });
+    let { data } = await api('trending/movie/day', { params: { language: 'es' } });
 
     // Si no hay resultados en Español, intenta obtener en inglés
     if (!data.results || data.results.length === 0) {
-      ({ data } = await api('trending/movie/week', { params: { language: 'en-US' } }));
+      ({ data } = await api('trending/movie/day', { params: { language: 'en-US' } }));
     }
 
     const movies = data.results;   // Almacenar la respuesta las peliculas
@@ -819,7 +819,7 @@ const fetchGenresAndRecommendations = async (id) => {
 
 let peliculasMostradasTendencias = [];
 let paginaActualTendencias = 2; // Empieza en la 2 porque la 1 ya está cargada
-const maxPaginasTendencias = 5;  // Para permitir hasta 100 películas (5 * 20)
+const maxPaginasTendencias = 6;  // Para permitir hasta 100 películas (5 * 20)
 let cargandoPeliculasTendencias = false; // Para evitar cargas simultáneas
 
 let totalPeliculasMostradasTendecias = 0; // Contador total mostrado
@@ -870,14 +870,14 @@ const cargarPeliculasTendecias = async () => {
   mostrarSkeletonstendecias();
 
   try {
-    let response = await api('trending/movie/week', { params: { language: 'es', page: paginaActualTendencias } });
+    let response = await api('trending/movie/day', { params: { language: 'es', page: paginaActualTendencias } });
 
     if (!response.data.results || response.data.results.length === 0) {
-      response = await api('trending/movie/week', { params: { language: 'en-US', page: paginaActualTendencias } });
+      response = await api('trending/movie/day', { params: { language: 'en-US', page: paginaActualTendencias } });
     }
 
     if (response.data.results && response.data.results.length > 0) {
-      const peliculasNuevasTedencia = response.data.results.filter(movie => !peliculasMostradasTendencias.includes(movie.id));
+      const peliculasNuevasTedencia = response.data.results.filter(movie => !peliculasMostradasTendencias.includes(movie.id));;
       const moviesContainer = gridTendenciasSection.querySelector('.movies-grid-container');
 
       for (const movie of peliculasNuevasTedencia) {
@@ -916,7 +916,7 @@ const scrollHandler = () => {
   if (cargandoPeliculasTendencias) return; // evitar llamadas múltiples
 
   // Comprobar si estamos cerca del final de la página
-  if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 10)) {
+  if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 10)) { // Altura del scroll
     cargarPeliculasTendecias();
   }
 };
@@ -960,7 +960,7 @@ setTimeout(() => {
 
 let peliculasMostradasPopulares = [];
 let paginaActualPopulares = 2;
-const maxPaginasPopulares = 5;
+const maxPaginasPopulares = 6;
 let cargandoPeliculasPopulares = false;
 
 let totalPeliculasMostradasPopulares = 0;
@@ -1073,9 +1073,9 @@ const scrollHandlerPopulares = () => {
   if (cargandoPeliculasPopulares) return;
 
   const scrollY = window.scrollY;
-  const altura = document.documentElement.scrollHeight - window.innerHeight;
+  const altura = document.documentElement.scrollHeight - window.innerHeight; // Altura del scroll
 
-  if (scrollY >= altura - 10) {
+  if (scrollY >= altura - 10) { // Altura del scroll
     cargarPeliculasPopulares();
   }
 };
@@ -1089,10 +1089,10 @@ const generarGridMoviesPopulares = () => {
     paginaActualPopulares = 2;
     peliculasMostradasPopulares = [];
     totalPeliculasMostradasPopulares = 0;
-    gridPopularesSection.querySelector('.movies-grid-container-popular').innerHTML = '';
+    gridPopularesSection.querySelector('.movies-grid-container-popular');
 
     cargarPeliculasPopulares();
-    window.addEventListener('scroll', scrollHandlerPopulares);
+    window.addEventListener('scroll', scrollHandlerPopulares).innerHTML = '';
   });
 
   showlesspopulareButton.addEventListener('click', () => {
@@ -1113,7 +1113,7 @@ generarGridMoviesPopulares();
 // Variable para mostrar peliculas ya mostrada proximamente
 let peliculasMostradasProximamente = [];
 let paginaActualProximamente = 2;
-const maxPaginasProximamente = 5;
+const maxPaginasProximamente = 6; // no 5
 let cargandoPeliculasProximamente = false;
 
 let totalPeliculasMostradasProximanente = 0;
@@ -1179,7 +1179,9 @@ const ocultarSkeletonproximamente = () => {
 // Cargar películas Proximamente
 const cargarPeliculasProximamente = async () => {
 
-      if (paginaActualProximamente > maxPaginasProximamente || totalPeliculasMostradasProximanente >= limitePeliculasProximamente || cargandoPeliculasProximamente) return
+      if (paginaActualProximamente > maxPaginasProximamente || totalPeliculasMostradasProximanente >= limitePeliculasProximamente || cargandoPeliculasProximamente) return;
+        // Si la página actual supera el máximo, o si ya se mostraron todas las películas permitidas, o si ya se están cargando películas, se cancela la ejecución
+        
         
        cargandoPeliculasProximamente = true;
        mostrarSkeletonsproximamnete();
@@ -1248,7 +1250,7 @@ const scrollHandlerProximamente = () => {
 
      // Resetear datos para una nueva carga
      paginaActualProximamente = 2;
-     paginaActualProximamente = [];
+     peliculasMostradasProximamente = [];
      totalPeliculasMostradasProximanente = 0;
      gridProximamenteSection.querySelector('.movies-grid-container-proximamente').innerHTML = '';
 
@@ -1272,7 +1274,20 @@ const scrollHandlerProximamente = () => {
 
 generarGridMovieProximamente();
 
-          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

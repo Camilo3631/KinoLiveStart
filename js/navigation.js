@@ -1,3 +1,6 @@
+
+
+
 searchButton.addEventListener('click', () => {   
   location.hash = `#search=${searchInput.value}`;  
 });
@@ -25,12 +28,16 @@ botones.forEach(boton => {
 // Invocamos la función y llamamos al evento
 window.addEventListener('DOMContentLoaded', navigator, false);
 window.addEventListener('hashchange', navigator, false);
+window.addEventListener('scroll', onScroll);
+
+
 
 
 // Funcion para cuando carge el nevador y llame el has
 function navigator() {
   // Imprimimos en la consola el objeto location 
   console.log({ location });
+
 
   // Preguntamos si el hash está en la sección de trends
   if (location.hash.startsWith('#trends')) {
@@ -87,7 +94,8 @@ const homePage = () => {
   getTredingMovies();
   generarGridMoviesTendencias();
   generarGridMoviesPopulares();
-  generarGridMovieProximamente();
+  generarGridMoviesProximamente();
+
 
 
 };
