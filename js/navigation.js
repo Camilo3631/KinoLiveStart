@@ -28,7 +28,7 @@ botones.forEach(boton => {
 // Invocamos la función y llamamos al evento
 window.addEventListener('DOMContentLoaded', navigator, false);
 window.addEventListener('hashchange', navigator, false);
-window.addEventListener('scroll', onScroll);
+window.addEventListener('scroll', onScroll, false);
 
 
 
@@ -310,6 +310,8 @@ const searchPage = () => {
    getCategoriesPreview();
    const [_, query] = location.hash.split('=');
     getMoviesSearch(query);
+
+    onScroll = getPaginatedMoviesBySearch(query);
 
   
   

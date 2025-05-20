@@ -337,6 +337,13 @@ const ocultarskeletoncategory = () => {
   skeletons.forEach(skeleton => skeleton.remove());
 };
 
+
+
+
+
+let totalPeliculasMostradasBuscadas = 0;
+const limitePeliculasBuscadas = 100;
+let peliculasMostradasBusquedas = [];
 // Función asincrona para obtener la película según su búsqueda
 const getMoviesSearch = async (query) => {
 
@@ -346,6 +353,7 @@ const getMoviesSearch = async (query) => {
     });
 
     const movies = data.results;
+    limitePeliculasBuscadas >= data.totalPeliculasMostradasBuscadas;
     const container = document.querySelector('#search-section .container');
     const title = document.querySelector('.search-title');
 
@@ -362,7 +370,7 @@ const getMoviesSearch = async (query) => {
 
     // Procesar cada película
     movies.forEach(movie => {
-      if (!movie.poster_path) return;
+      if (!movie.poster_path || totalPeliculasMostradasBuscadas >= limitePeliculasBuscadas) return
 
       const movieElement = document.createElement('div');
       movieElement.classList.add('movie-card', 'mb-4');
@@ -391,6 +399,7 @@ const getMoviesSearch = async (query) => {
 
       // Añadir el elemnto de la película la contendor
       container.appendChild(movieElement);
+      totalPeliculasMostradasBuscadas++
     });
 
     // Ocultar el home  y demás secciónes
@@ -446,6 +455,73 @@ homeBtn.addEventListener('click', () => {
   toggleButtonsVisibility('home');
 
 });
+const getPaginatedMoviesBySearch = (query) => {
+  let page = 2; // La búsqueda inicial es la página 1
+  const maxPages = 8; // Máximo de páginas a cargar
+  const seenMovieIds = new Set();
+
+  // Manejador de scroll infinito
+  async function cargarMasPeliculas() {
+    // No cargar más si se alcanza el límite de películas o de páginas
+    if (totalPeliculasMostradasBuscadas >= limitePeliculasBuscadas || page > maxPages) return;
+
+    try {
+      const { data } = await api('/search/movie', {
+        params: { query, page }
+      });
+
+      const movies = data.results;
+      page++; // Incrementar página para la próxima vez
+
+      const container = document.querySelector('#search-section .container');
+
+      movies.forEach(movie => {
+        if (!movie.poster_path || totalPeliculasMostradasBuscadas >= limitePeliculasBuscadas) return;
+        if (seenMovieIds.has(movie.id)) return;
+
+        seenMovieIds.add(movie.id);
+
+        const movieElement = document.createElement('div');
+        movieElement.classList.add('movie-card', 'mb-4');
+
+        const imgElement = document.createElement('img');
+        imgElement.classList.add('img-fluid', 'rounded');
+        imgElement.setAttribute('src', `https://image.tmdb.org/t/p/w500${movie.poster_path}`);
+        imgElement.onerror = () => {
+          imgElement.setAttribute('src', 'img/Brak OBRAZU.png');
+        };
+
+        movieElement.innerHTML = `<h5>${movie.title}</h5>`;
+        movieElement.prepend(imgElement);
+
+        movieElement.addEventListener('click', () => {
+          history.pushState(null, '', `#movie=${movie.id}`);
+        });
+
+        container.appendChild(movieElement);
+        totalPeliculasMostradasBuscadas++;
+      });
+    } catch (error) {
+      console.error('Error al cargar más películas:', error);
+    }
+  }
+
+  // Scroll listener interno
+  const onScroll = () => {
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+    if (scrollTop + clientHeight >= scrollHeight - 100) {
+      cargarMasPeliculas();
+    }
+  };
+
+  // Registrar el scroll
+  window.addEventListener('scroll', onScroll);
+};
+
+
+
+
 
 
 
@@ -820,39 +896,87 @@ const fetchGenresAndRecommendations = async (id) => {
 let totalPeliculasCargadas = 0;
 const limiteTotalPeliculas = 80;
 let cargando = false;
+let buscando = false;
 const peliculasCargadas = new Set();
+
+let queryBusqueda = ''; // Guarda el término de búsqueda actual
+let paginarBusquedaFn = null; // Función paginadora para búsqueda
 
 const agregarPelicula = (pelicula) => {
   if (!peliculasCargadas.has(pelicula.id)) {
     peliculasCargadas.add(pelicula.id);
     totalPeliculasCargadas++;
-    // Renderiza la película aquí
-    console.log(Agregada `${pelicula.title}`);
+    console.log(`Agregada: ${pelicula.title}`);
+    // Aquí debes agregar la película al DOM
   }
 };
 
-const cargarPeliculas = async () => {
-  if (cargando) return; // Evita llamadas concurrentes
-  if (totalPeliculasCargadas >= limiteTotalPeliculas) {
-    // Ya llegaste al límite, puedes remover el scroll si quieres
-    window.removeEventListener('scroll', onScroll);
-    return;
-  }
-
-  cargando = true;
-
+const cargarPeliculasNormales = async () => {
+  // Llama tus funciones normales de carga
   await cargarPeliculasTendecias();
   await cargarPeliculasPopulares();
   await cargarPeliculasProximamente();
-
-  cargando = false;
 };
 
-const onScroll = () => {
+const busquedaPaginada = async () => {
+  if (!paginarBusquedaFn) return false;
+  const puedeSeguir = await paginarBusquedaFn();
+  return puedeSeguir;
+};
+
+let onScroll = async () => {
+  if (cargando || buscando) return;
+
   if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
-    cargarPeliculas();
+    if (queryBusqueda) {
+      buscando = true;
+      const puedeSeguir = await busquedaPaginada();
+      if (!puedeSeguir) {
+        window.removeEventListener('scroll', onScroll);
+      }
+      buscando = false;
+    } else {
+      cargando = true;
+      if (totalPeliculasCargadas < limiteTotalPeliculas) {
+        await cargarPeliculasNormales();
+      } else {
+        window.removeEventListener('scroll', onScroll);
+      }
+      cargando = false;
+    }
   }
 };
+
+const iniciarBusqueda = (query) => {
+  peliculasCargadas.clear();
+  totalPeliculasCargadas = 0;
+  queryBusqueda = query;
+
+  // Remueve el listener anterior para evitar multiples escuchas
+  window.removeEventListener('scroll', onScroll);
+
+  // Crea el closure solo una vez por búsqueda
+  paginarBusquedaFn = getPaginatedMoviesBySearch(query);
+
+  // Añade el listener para scroll
+  window.addEventListener('scroll', onScroll);
+
+  // Llama el scroll manual para cargar la primera página
+  onScroll();
+};
+
+const volverAlHome = () => {
+  peliculasCargadas.clear();
+  totalPeliculasCargadas = 0;
+  queryBusqueda = '';
+
+  window.removeEventListener('scroll', onScroll);
+  paginarBusquedaFn = null;
+
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+};
+
 
 
 
