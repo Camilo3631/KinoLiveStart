@@ -28,6 +28,7 @@ const proximamenteSection = document.getElementById('proximamente');
 const categoryGridSection = document.getElementById('category-grid-container');
 
 const botones = document.querySelectorAll('.btn-polish-white-ms-3');
+const categoryTitle = document.querySelector('.grid-category-title');
 
 
 

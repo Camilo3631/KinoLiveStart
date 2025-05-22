@@ -342,7 +342,7 @@ const ocultarskeletoncategory = () => {
 
 
 let totalPeliculasMostradasBuscadas = 0;
-const limitePeliculasBuscadas = 100;
+const limitePeliculasBuscadas = 160;
 let peliculasMostradasBusquedas = [];
 // Función asincrona para obtener la película según su búsqueda
 const getMoviesSearch = async (query) => {
@@ -370,7 +370,7 @@ const getMoviesSearch = async (query) => {
 
     // Procesar cada película
     movies.forEach(movie => {
-      if (!movie.poster_path || totalPeliculasMostradasBuscadas >= limitePeliculasBuscadas) return
+      if (!movie.poster_path || totalPeliculasMostradasBuscadas >= limitePeliculasBuscadas) return;
 
       const movieElement = document.createElement('div');
       movieElement.classList.add('movie-card', 'mb-4');
@@ -519,13 +519,11 @@ const getPaginatedMoviesBySearch = (query) => {
   window.addEventListener('scroll', onScroll);
 };
 
+let totalPeliculasCargadasCategory = 0; // variable global para todo el proceso
+const limitePeliculasCategory = 80;
+const seenMovieIds = new Set(); // también global para evitar duplicados
 
-
-
-
-
-
-// Función para obtener películas por categoría
+// Función para obtener películas por categoría (carga inicial)
 const getMoviesCategory = async (id) => {
   try {
     const genereMap = {
@@ -550,10 +548,8 @@ const getMoviesCategory = async (id) => {
       37: 'Western',
     };
 
-    // Si el ID no está en el mapa, salimos silenciosamente
     if (!genereMap[id]) return;
 
-    // Mostrar sección y skeletons
     const categoryGridSection = document.getElementById('category-grid-container');
     categoryGridSection.classList.remove('d-none');
 
@@ -561,81 +557,83 @@ const getMoviesCategory = async (id) => {
     moviesContainer.innerHTML = '';
     mostrarSkeletoncategory();
 
-    // Ocultar otras secciones
     bannerSection.classList.add('d-none');
     popularesSection.classList.add('d-none');
     tendenciasSection.classList.add('d-none');
     proximamenteSection.classList.add('d-none');
     movieSliders.forEach(slider => slider.classList.add('d-none'));
 
-    // Función auxiliar para buscar por idioma
     const fetchByLanguage = async (lang) => {
       const response = await api('discover/movie', {
         params: {
           with_genres: id,
           with_original_language: lang,
+          page: 1,
         },
       });
       return response.data.results || [];
     };
 
-    // Buscar películas en español e inglés al mismo tiempo
     const [pelisEs, pelisEN] = await Promise.all([
       fetchByLanguage('es'),
       fetchByLanguage('en'),
     ]);
 
-    const allMovies = [...pelisEs, ...pelisEN];
+    const allMoviesRaw = [...pelisEs, ...pelisEN];
+
+    // Eliminar duplicados y actualizar seenMovieIds
+    const uniqueMoviesMap = new Map();
+    allMoviesRaw.forEach(movie => {
+      if (!uniqueMoviesMap.has(movie.id)) {
+        uniqueMoviesMap.set(movie.id, movie);
+        seenMovieIds.add(movie.id);
+      }
+    });
+
+    const allMovies = Array.from(uniqueMoviesMap.values());
     if (allMovies.length === 0) throw new Error('No se encontraron películas');
 
-    // Cambiar el titulo de la categoría
     const categoryTitle = document.querySelector('.grid-category-title');
     categoryTitle.textContent = `Películas por categoría ${genereMap[id]}`;
 
-    // Ocultar los skeletons  y mostrar películas
     ocultarskeletoncategory();
     moviesContainer.innerHTML = '';
 
-    allMovies.forEach(movie => {
-      // Crear el elemento de imagen con manejo de error
+    // Limitar cuántas películas se muestran
+    const peliculasParaMostrar = allMovies.slice(0, limitePeliculasCategory);
+
+    peliculasParaMostrar.forEach(movie => {
       const imgElement = document.createElement('img');
       imgElement.classList.add('img-fluid', 'rounded');
       imgElement.setAttribute('src', `https://image.tmdb.org/t/p/w500${movie.poster_path}`);
-
-      // Si la imagen falla, se carga una imagen por defecto
       imgElement.onerror = () => {
         imgElement.setAttribute('src', 'img/Brak OBRAZU.png');
       };
 
-      // Crear el título de la película
       const movieTitle = document.createElement('h5');
       movieTitle.textContent = movie.title;
 
-      // Crear el enlace a la página de la película
       const movieLink = document.createElement('a');
       movieLink.href = `https://www.themoviedb.org/movie/${movie.id}`;
-      movieLink.target = '_black';
+      movieLink.target = '_blank';
 
-      // Crea la targeta de película y añadir elementos
       const movieCard = document.createElement('div');
       movieCard.classList.add('movie-card');
       movieCard.appendChild(imgElement);
       movieCard.appendChild(movieTitle);
       movieCard.appendChild(movieLink);
 
-      // Agregar el evento de clic para el historial
       movieCard.addEventListener('click', () => {
-        history.pushState(null, 'òijh', '#movie' + movie.id);
+        history.pushState(null, '', '#movie' + movie.id);
       });
 
-      // Añadir la tarjeta de película al contenedor
       moviesContainer.appendChild(movieCard);
     });
 
-    // Llamamos createOberserver después de agregar las imágenes dinámicamente
+    totalPeliculasCargadasCategory = peliculasParaMostrar.length;
+
     createObserver();
 
-    // Mostrar botón "Ver menos"
     const showLessCategoryGridButton = document.getElementById('show-less-category-grid');
     showLessCategoryGridButton.classList.remove('d-none');
 
@@ -643,13 +641,13 @@ const getMoviesCategory = async (id) => {
       bannerSection.classList.remove('d-none');
       tendenciasSection.classList.remove('d-none');
       proximamenteSection.classList.remove('d-none');
-      categoryGridSection.classList.remove('d-none');
-      movieSliders.forEach(slider => slider.classList.add('d-none'));
+      categoryGridSection.classList.add('d-none');
+      movieSliders.forEach(slider => slider.classList.remove('d-none'));
       showLessCategoryGridButton.classList.add('d-none');
       location.hash = '';
     };
 
-  } catch {
+  } catch (error) {
     console.error('Error al cargar películas por categoría:', error);
     ocultarskeletoncategory();
 
@@ -663,6 +661,126 @@ const getMoviesCategory = async (id) => {
   }
 };
 
+// Función para cargar más películas (paginación con scroll)
+const getPaginatedMoviesByCategory = (id) => {
+  let page = 2;
+  const maxPages = 6;
+  let isLoading = false;
+  let scrollActivo = false;
+
+  const genereMap = {
+    28: 'Acción',
+    12: 'Aventura',
+    16: 'Animación',
+    35: 'Comedia',
+    80: 'Fantasía',
+    99: 'Documental',
+    18: 'Drama',
+    10751: 'Familiar',
+    14: 'Fantasia',
+    36: 'Historia',
+    27: 'Terror',
+    10402: 'Música',
+    9648: 'Misterio',
+    10749: 'Romance',
+    878: 'Ciencia ficción',
+    10770: 'Película de tv',
+    53: 'Suspenso',
+    10752: 'Bélica',
+    37: 'Western',
+  };
+
+  if (!genereMap[id]) return;
+
+  const cargarMasPeliculas = async () => {
+    if (isLoading || totalPeliculasCargadasCategory >= limitePeliculasCategory || page > maxPages) return;
+    isLoading = true;
+
+    mostrarSkeletoncategory();
+
+    try {
+      const [pelisEs, pelisEN] = await Promise.all([
+        api('discover/movie', {
+          params: {
+            with_genres: id,
+            with_original_language: 'es',
+            page,
+          },
+        }).then(res => res.data.results || []),
+
+        api('discover/movie', {
+          params: {
+            with_genres: id,
+            with_original_language: 'en',
+            page,
+          },
+        }).then(res => res.data.results || []),
+      ]);
+
+      page++;
+
+      // Filtrar duplicados usando el Set global
+      const nuevasPeliculas = [...pelisEs, ...pelisEN].filter(movie => !seenMovieIds.has(movie.id));
+      nuevasPeliculas.forEach(movie => seenMovieIds.add(movie.id));
+
+      const peliculasDisponibles = nuevasPeliculas.slice(0, limitePeliculasCategory - totalPeliculasCargadasCategory);
+
+      const moviesContainer = document.querySelector('.movies-grid-container-category');
+      ocultarskeletoncategory();
+
+      peliculasDisponibles.forEach(movie => {
+        const movieCard = document.createElement('div');
+        movieCard.classList.add('movie-card');
+
+        const img = document.createElement('img');
+        img.src = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+        img.onerror = () => {
+          img.src = 'img/Brak OBRAZU.png';
+        };
+
+        const title = document.createElement('h5');
+        title.textContent = movie.title;
+
+        const link = document.createElement('a');
+        link.href = `https://www.themoviedb.org/movie/${movie.id}`;
+        link.target = '_blank';
+
+        movieCard.appendChild(img);
+        movieCard.appendChild(title);
+        movieCard.appendChild(link);
+
+        movieCard.addEventListener('click', () => {
+          history.pushState(null, '', '#movie' + movie.id);
+        });
+
+        moviesContainer.appendChild(movieCard);
+      });
+
+      totalPeliculasCargadasCategory += peliculasDisponibles.length;
+      createObserver();
+    } catch (error) {
+      console.error('Error cargando películas por categoría:', error);
+    } finally {
+      isLoading = false;
+    }
+  };
+
+  const onScroll = () => {
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+    if (scrollTop + clientHeight >= scrollHeight - 150) {
+      cargarMasPeliculas();
+    }
+  };
+
+  if (!scrollActivo) {
+    window.removeEventListener('scroll', onScroll);
+    window.addEventListener('scroll', onScroll);
+    scrollActivo = true;
+  }
+
+  // Primera carga
+  cargarMasPeliculas();
+};
 
 
 let visibleSectionBeforeDetail = null; // Para recordar la seccion estaba visiible antes de entrar en datalles

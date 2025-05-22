@@ -1,8 +1,8 @@
 
 
 
-searchButton.addEventListener('click', () => {   
-  location.hash = `#search=${searchInput.value}`;  
+searchButton.addEventListener('click', () => {
+  location.hash = `#search=${searchInput.value}`;
 });
 
 
@@ -62,7 +62,7 @@ function navigator() {
   }
 
   document.body.scrollTo = 0;
-    // Funcion con algunos navegadores en el caso de safari
+  // Funcion con algunos navegadores en el caso de safari
   document.documentElement.scrollTo = 0;
 
 };
@@ -77,9 +77,9 @@ const homePage = () => {
   tendenciasSection.classList.remove('d-none');
   searchSection.classList.add('d-none');
 
-  
-  
-  
+
+
+
 
   movieDetailSection.classList.add('d-none');
   categoryGridSection.classList.add('d-none')
@@ -110,232 +110,246 @@ const categoriesPage = () => {
   gridTendenciasSection.classList.add('d-none');
   getTredingMovies();
   getCategoriesPreview()
-  getMoviesCategory();
-};
+ 
+  // ['#category', 'id-name']
+  const [_, categoryData] = location.hash.split('=');
+  const [categoryId, categoryName] = categoryData.split('-');
 
+  categoryTitle.innerHTML = categoryName;
 
-const movieDetailsPage = () => {
-  console.log('Entrando a movieDetailsPage');
+ getMoviesCategory(categoryId)
+  onScroll =  getPaginatedMoviesByCategory(categoryId)
 
-  // Mostrar siempre el formulario de búsqueda
-  searchForm.classList.remove('d-none');
+}
 
-  // Guardamos cuál era la sección visible antes de los detalles
-  if (!visibleSectionBeforeDetail) {
-    if (!gridTendenciasSection.classList.contains('d-none')) {
-      visibleSectionBeforeDetail = 'gridTendencias';
-    } else if (!gridPopularessSection.classList.contains('d-none')) {
-      visibleSectionBeforeDetail = 'gridPopulares';
-    } else if (!gridProximamenteSection.classList.contains('d-none')) {
-      visibleSectionBeforeDetail = 'gridProximamente';
-    } else if ([...movieSliders].some(slider => !slider.classList.contains('d-none'))) {
-      visibleSectionBeforeDetail = 'sliders';
-    }
-  }
+    
 
-  // Ocultar secciones principales y los sliders
-  bannerSection.classList.add('d-none');
-  gridTendenciasSection.classList.add('d-none');
-  gridPopularessSection.classList.add('d-none');
-  gridProximamenteSection.classList.add('d-none');
-  categoryGridSection.classList.add('d-none');
-  tendenciasSection.classList.add('d-none');
-  popularesSection.classList.add('d-none');
-  proximamenteSection.classList.add('d-none');
-  movieSliders.forEach(slider => slider.classList.add('d-none'));
+  const movieDetailsPage = () => {
+    console.log('Entrando a movieDetailsPage');
 
-  // Mostrar la sección de detalles
-  movieDetailSection.classList.remove('d-none');
+    // Mostrar siempre el formulario de búsqueda
+    searchForm.classList.remove('d-none');
 
-  // Obtener el ID de la película desde la URL
-  const [_, movieId] = location.hash.split('=');
-  if (!movieId) return;
-
-  // Obtener detalles de la película
-  Api.get(`movie/${movieId}`, { params: { language: 'es' } })
-    .then(res => {
-      const movie = res.data;
-
-      // Mostrar fondo y póster
-      movieBackground.style.backgroundImage = `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`;
-      moviePoster.innerHTML = `<img src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">`;
-      movieTitle.textContent = movie.title;
-      movieDescription.textContent = movie.overview || 'Descripción no disponible.';
-      movieReleaseDate.textContent = `Fecha de estreno: ${movie.release_date || 'N/A'}`;
-
-      // Mostrar categorías
-      const categoriesContainer = document.getElementById('movie-categories');
-      categoriesContainer.innerHTML = '';
-      if (movie.genres && movie.genres.length > 0) {
-        categoriesContainer.innerHTML = '<h4>Categorías:</h4>';
-        movie.genres.forEach(genre => {
-          const btn = document.createElement('button');
-          btn.textContent = genre.name;
-          btn.className = 'btn btn-dark m-1';
-          categoriesContainer.appendChild(btn);
-        });
+    // Guardamos cuál era la sección visible antes de los detalles
+    if (!visibleSectionBeforeDetail) {
+      if (!gridTendenciasSection.classList.contains('d-none')) {
+        visibleSectionBeforeDetail = 'gridTendencias';
+      } else if (!gridPopularessSection.classList.contains('d-none')) {
+        visibleSectionBeforeDetail = 'gridPopulares';
+      } else if (!gridProximamenteSection.classList.contains('d-none')) {
+        visibleSectionBeforeDetail = 'gridProximamente';
+      } else if ([...movieSliders].some(slider => !slider.classList.contains('d-none'))) {
+        visibleSectionBeforeDetail = 'sliders';
       }
+    }
 
-      // Mostrar películas similares (solo las primeras 4)
-      const similaresContainer = document.getElementById('movie-similares');
-      similaresContainer.innerHTML = '';
+    // Ocultar secciones principales y los sliders
+    bannerSection.classList.add('d-none');
+    gridTendenciasSection.classList.add('d-none');
+    gridPopularessSection.classList.add('d-none');
+    gridProximamenteSection.classList.add('d-none');
+    categoryGridSection.classList.add('d-none');
+    tendenciasSection.classList.add('d-none');
+    popularesSection.classList.add('d-none');
+    proximamenteSection.classList.add('d-none');
+    movieSliders.forEach(slider => slider.classList.add('d-none'));
 
-      Api.get(`movie/${movieId}/similar`, { params: { language: 'es' } })
-        .then(similarRes => {
-          const similarMovies = similarRes.data.results.slice(0, 4); // Limitar a 4 películas
-          if (similarMovies.length > 0) {
-            const row = document.createElement('div');
-            row.className = 'row justify-content-center';
+    // Mostrar la sección de detalles
+    movieDetailSection.classList.remove('d-none');
 
-            const titleCol = document.createElement('div');
-            titleCol.className = 'col-12 text-center mb-4';
-            titleCol.innerHTML = '<h4 class="fw-bold">Películas similares</h4>';
-            row.appendChild(titleCol);
+    // Obtener el ID de la película desde la URL
+    const [_, movieId] = location.hash.split('=');
+    if (!movieId) return;
 
-            similarMovies.forEach(similar => {
-              const col = document.createElement('div');
-              col.className = 'col-6 col-md-3 d-flex justify-content-center mb-4';
+    // Obtener detalles de la película
+    Api.get(`movie/${movieId}`, { params: { language: 'es' } })
+      .then(res => {
+        const movie = res.data;
 
-              const card = document.createElement('div');
-              card.className = 'movie-card text-center p-2 shadow rounded';
-              card.style.width = '100%';
+        // Mostrar fondo y póster
+        movieBackground.style.backgroundImage = `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`;
+        moviePoster.innerHTML = `<img src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">`;
+        movieTitle.textContent = movie.title;
+        movieDescription.textContent = movie.overview || 'Descripción no disponible.';
+        movieReleaseDate.textContent = `Fecha de estreno: ${movie.release_date || 'N/A'}`;
 
-              card.innerHTML = `
+        // Mostrar categorías
+        const categoriesContainer = document.getElementById('movie-categories');
+        categoriesContainer.innerHTML = '';
+        if (movie.genres && movie.genres.length > 0) {
+          categoriesContainer.innerHTML = '<h4>Categorías:</h4>';
+          movie.genres.forEach(genre => {
+            const btn = document.createElement('button');
+            btn.textContent = genre.name;
+            btn.className = 'btn btn-dark m-1';
+            categoriesContainer.appendChild(btn);
+          });
+        }
+
+        // Mostrar películas similares (solo las primeras 4)
+        const similaresContainer = document.getElementById('movie-similares');
+        similaresContainer.innerHTML = '';
+
+        Api.get(`movie/${movieId}/similar`, { params: { language: 'es' } })
+          .then(similarRes => {
+            const similarMovies = similarRes.data.results.slice(0, 4); // Limitar a 4 películas
+            if (similarMovies.length > 0) {
+              const row = document.createElement('div');
+              row.className = 'row justify-content-center';
+
+              const titleCol = document.createElement('div');
+              titleCol.className = 'col-12 text-center mb-4';
+              titleCol.innerHTML = '<h4 class="fw-bold">Películas similares</h4>';
+              row.appendChild(titleCol);
+
+              similarMovies.forEach(similar => {
+                const col = document.createElement('div');
+                col.className = 'col-6 col-md-3 d-flex justify-content-center mb-4';
+
+                const card = document.createElement('div');
+                card.className = 'movie-card text-center p-2 shadow rounded';
+                card.style.width = '100%';
+
+                card.innerHTML = `
                 <img src="https://image.tmdb.org/t/p/original${similar.poster_path}" alt="${similar.title}" class="img-fluid rounded mb-2" style="height: 300px; object-fit: cover;">
                 <h5 class="text-truncate" title="${similar.title}">${similar.title}</h5>
               `;
 
-              col.appendChild(card);
-              row.appendChild(col);
-            });
+                col.appendChild(card);
+                row.appendChild(col);
+              });
 
-            similaresContainer.appendChild(row);
-          } else {
-            console.log('No se encontraron películas similares.');
-          }
-        })
-        .catch(err => {
-          console.error('Error al obtener películas similares:', err);
-        });
-    })
-    .catch(error => {
-      console.error('Error al obtener detalles de la película:', error);
+              similaresContainer.appendChild(row);
+            } else {
+              console.log('No se encontraron películas similares.');
+            }
+          })
+          .catch(err => {
+            console.error('Error al obtener películas similares:', err);
+          });
+      })
+      .catch(error => {
+        console.error('Error al obtener detalles de la película:', error);
+      });
+
+    // Funcionalidad del botón "Volver"
+    goBackButton.addEventListener('click', () => {
+      movieDetailSection.classList.add('d-none');
+
+      switch (visibleSectionBeforeDetail) {
+        case 'gridTendencias':
+          gridTendenciasSection.classList.remove('d-none');
+          break;
+        case 'gridPopularess':
+          gridPopularessSection.classList.remove('d-none');
+          break;
+        case 'gridProximamente':
+          gridProximamenteSection.classList.remove('d-none');
+          break;
+        case 'sliders':
+          movieSliders.forEach(slider => slider.classList.remove('d-none'));
+          break;
+      }
+
+      resetDetailView();
     });
 
-  // Funcionalidad del botón "Volver"
-  goBackButton.addEventListener('click', () => {
+    // Funcionalidad del botón "Volver al home"
+    document.getElementById('go-back-home').addEventListener('click', () => {
+      movieDetailSection.classList.add('d-none');
+      bannerSection.classList.remove('d-none');
+      movieSliders.forEach(slider => slider.classList.remove('d-none'));
+
+      resetDetailView();
+    });
+
+    // Función para resetear la vista de detalles y restaurar elementos
+    const resetDetailView = () => {
+      // Limpiar la vista de detalles de la película
+      moviePoster.innerHTML = '';
+      movieBackground.style.backgroundImage = '';
+      document.getElementById('movie-categories').innerHTML = '';
+      document.getElementById('movie-similares').innerHTML = '';
+
+      // Limpiar la variable que recuerda qué sección estaba visible
+      visibleSectionBeforeDetail = null;
+
+      // Restaurar la visibilidad de las secciones principales
+      getTredingMovies();
+      generarGridMoviesTendencias();
+      generarGridCategoryMovies();
+      toggleButtons(); // Revisa el estado de los botones
+    };
+
+    // Función para verificar y ocultar/mostrar botones según la sección
+    const toggleButtons = () => {
+      const isDetailPage = !movieDetailSection.classList.contains('d-none');
+
+      // Mostrar o esconder botones dependiendo de si estamos en la página de detalles
+      if (isDetailPage) {
+        document.getElementById('go-back-home').classList.add('d-none');  // Ocultar "Volver al home"
+        goBackButton.classList.remove('d-none');  // Mostrar "Volver a la sección"
+      } else {
+        document.getElementById('go-back-home').classList.remove('d-none');  // Mostrar "Volver al home"
+        goBackButton.classList.add('d-none');  // Ocultar "Volver a la sección"
+      }
+    };
+
+
+    onScroll = getPaginatedMoviesByCategory(id);
+
+  };
+
+
+
+  // Generamos un arrow function para searchPage
+  const searchPage = () => {
+    console.log('Search!!');
+
+    // Mostrar secciones principales del home
+    bannerSection.classList.add('d-none');
+    tendenciasSection.classList.add('d-none');
+    popularesSection.classList.add('d-none');
+    proximamenteSection.classList.add('d-none');
+
+
     movieDetailSection.classList.add('d-none');
+    categoryGridSection.classList.remove('d-none');
+    gridTendenciasSection.classList.add('d-none');
 
-    switch (visibleSectionBeforeDetail) {
-      case 'gridTendencias':
-        gridTendenciasSection.classList.remove('d-none');
-        break;
-      case 'gridPopularess':
-        gridPopularessSection.classList.remove('d-none');
-        break;
-      case 'gridProximamente':
-        gridProximamenteSection.classList.remove('d-none');
-        break;
-      case 'sliders':
-        movieSliders.forEach(slider => slider.classList.remove('d-none'));
-        break;
-    }
+    // Búscador simpre visible
+    searchForm.classList.remove('d-none');
 
-    resetDetailView();
-  });
-
-  // Funcionalidad del botón "Volver al home"
-  document.getElementById('go-back-home').addEventListener('click', () => {
-    movieDetailSection.classList.add('d-none');
-    bannerSection.classList.remove('d-none');
-    movieSliders.forEach(slider => slider.classList.remove('d-none'));
-
-    resetDetailView();
-  });
-
-  // Función para resetear la vista de detalles y restaurar elementos
-  const resetDetailView = () => {
-    // Limpiar la vista de detalles de la película
-    moviePoster.innerHTML = '';
-    movieBackground.style.backgroundImage = '';
-    document.getElementById('movie-categories').innerHTML = '';
-    document.getElementById('movie-similares').innerHTML = '';
-
-    // Limpiar la variable que recuerda qué sección estaba visible
-    visibleSectionBeforeDetail = null;
-
-    // Restaurar la visibilidad de las secciones principales
     getTredingMovies();
-    generarGridMoviesTendencias();
-    generarGridCategoryMovies();
-    toggleButtons(); // Revisa el estado de los botones
-  };
-
-  // Función para verificar y ocultar/mostrar botones según la sección
-  const toggleButtons = () => {
-    const isDetailPage = !movieDetailSection.classList.contains('d-none');
-
-    // Mostrar o esconder botones dependiendo de si estamos en la página de detalles
-    if (isDetailPage) {
-      document.getElementById('go-back-home').classList.add('d-none');  // Ocultar "Volver al home"
-      goBackButton.classList.remove('d-none');  // Mostrar "Volver a la sección"
-    } else {
-      document.getElementById('go-back-home').classList.remove('d-none');  // Mostrar "Volver al home"
-      goBackButton.classList.add('d-none');  // Ocultar "Volver a la sección"
-    }
-  };
-};
-
-
-
-// Generamos un arrow function para searchPage
-const searchPage = () => {
-  console.log('Search!!');
-
-   // Mostrar secciones principales del home
-   bannerSection.classList.add('d-none');
-   tendenciasSection.classList.add('d-none');
-   popularesSection.classList.add('d-none');
-   proximamenteSection.classList.add('d-none');
- 
- 
-   movieDetailSection.classList.add('d-none');
-   categoryGridSection.classList.remove('d-none');
-   gridTendenciasSection.classList.add('d-none');
- 
-   // Búscador simpre visible
-   searchForm.classList.remove('d-none');
-
-   getTredingMovies();
-   getCategoriesPreview();
-   const [_, query] = location.hash.split('=');
+    getCategoriesPreview();
+    const [_, query] = location.hash.split('=');
     getMoviesSearch(query);
 
     onScroll = getPaginatedMoviesBySearch(query);
 
-  
-  
-};
+
+
+  };
 
 
 
-// Función para el slider y grid de tendencias
-const trendsPage = () => {
-  console.log('TRENDS!!');
+  // Función para el slider y grid de tendencias
+  const trendsPage = () => {
+    console.log('TRENDS!!');
 
 
-   bannerSection.classList.add('d-none');
-   proximamenteSection.classList.add('d-none');
-   popularesSection.classList.add('d-none');
-   getTredingMovies();
-   generarGridMoviesTendencias();
-   getCategoriesPreview();
+    bannerSection.classList.add('d-none');
+    proximamenteSection.classList.add('d-none');
+    popularesSection.classList.add('d-none');
+    getTredingMovies();
+    generarGridMoviesTendencias();
+    getCategoriesPreview();
 
 
-   movieDetailSection.classList.add('d-none');
-   categoryGridSection.classList.add('d-none')
- 
-   // Búscador simpre visible
-   searchForm.classList.remove('d-none');
+    movieDetailSection.classList.add('d-none');
+    categoryGridSection.classList.add('d-none')
 
-};
+    // Búscador simpre visible
+    searchForm.classList.remove('d-none');
+
+  };
