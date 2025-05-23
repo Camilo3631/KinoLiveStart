@@ -997,3 +997,28 @@ footer {
   position: relative; /* Asegúrate de que el footer esté en el flujo del documento */
   z-index: 10; /* Asegúrate de que no sea cubierto por otros elementos */
 }
+
+
+.movie-card {
+  width: 200px; /* Ajusta el tamaño que necesites */
+  margin: 10px;
+}
+
+.movie-card img {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+}
+
+
+.heart-icon {
+  position: absolute;
+  top: 2px !important;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.3rem; /* Más pequeño */
+  color: red;
+  user-select: none;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
