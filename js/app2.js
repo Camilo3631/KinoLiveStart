@@ -49,18 +49,16 @@ const lazyLoader = () => {
 
 };
 
-
 const getMoviesProximmamente = async () => {
-  // Buscar el contenedor donde se muestran las peliculas
   const movieContainer = document.querySelector('.movies-container-proximamente');
   if (!movieContainer) {
     console.error('No se encontró el contenedor de peliculas.');
     return;
   }
 
-  // Limpiar cualquier contenido previo y agregar el skeleton de carga
-  movieContainer.innerHTML = '';  // Limpiar cualquier contenido previo
-  for (let i = 0; i < 6; i++) {  // Crear 6 skeletons para simular las 6 películas
+  // Mostrar skeletons
+  movieContainer.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
     const loadingCard = document.createElement('div');
     loadingCard.classList.add('loading-card-slider');
     movieContainer.appendChild(loadingCard);
@@ -68,45 +66,81 @@ const getMoviesProximmamente = async () => {
 
   try {
     let { data } = await api('/movie/upcoming', { params: { language: 'es' } });
-
-    // Si no hay resultados en Español, intenta obtener en inglés
     if (!data.results || data.results.length === 0) {
       ({ data } = await api('/movie/upcoming', { params: { language: 'en-US' } }));
     }
 
-    const movies = data.results;   // Almacenar la respuesta las peliculas
-    movieContainer.innerHTML = ''; // Limpiar cualquier contenido previo del contenedor
+    const movies = data.results;
+    movieContainer.innerHTML = '';
 
-    // Mostrar las 6 primeras peliculas
-    movies.slice(0, 6).forEach(movie => {  // Limitar a 6 peliculas
-      const movieCard = document.createElement('div');  // Crear el contenedor de cada película
-      movieCard.classList.add('movie-card'); // Agregar la clase 'movie-card'
+    movies.slice(0, 6).forEach(movie => {
+      const movieCard = document.createElement('div');
+      movieCard.classList.add('movie-card');
+      movieCard.style.position = 'relative';
 
-      // Rellenar el contenedor con la imagen y título de la película
-      movieCard.innerHTML = ` 
-        <img data-src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
-        <h5>${movie.title}</h5>
-      `;
+      const imgContainer = document.createElement('div');
+      imgContainer.style.position = 'relative';
+      imgContainer.style.display = 'inline-block';
 
-      // Agregar el evento de clic para actualizar el hash
-      movieCard.addEventListener('click', () => {
-        location.hash = '#movie' + movie.id;  // Actualiza el hash con el ID de la película
+      const img = document.createElement('img');
+      img.setAttribute('data-src', `https://image.tmdb.org/t/p/original${movie.poster_path}`);
+      img.alt = movie.title;
+
+      const heartIcon = document.createElement('span');
+      heartIcon.innerHTML = '❤️';
+      heartIcon.classList.add('heart-icon');
+
+
+      // Mostrar el corazón al pasar el mouse
+      imgContainer.addEventListener('mouseenter', () => {
+        if (!heartIcon.classList.contains('liked')) {
+          heartIcon.style.opacity = '1';
+          heartIcon.style.color = 'rgba(255, 255, 255, 0.4)';
+        }
+      });
+      imgContainer.addEventListener('mouseleave', () => {
+        if (!heartIcon.classList.contains('liked')) {
+          heartIcon.style.opacity = '0';
+          heartIcon.style.color = 'transparent';
+        }
       });
 
-      // Agregar la tarjeta de cada película al contenedor
-      movieContainer.appendChild(movieCard);
+      // Toggle real del corazón
+      heartIcon.addEventListener('click', e => {
+        e.stopPropagation();
+        heartIcon.classList.toggle('liked');
+        if (heartIcon.classList.contains('liked')) {
+          heartIcon.style.color = 'red';
+          heartIcon.style.opacity = '1';
+        } else {
+          heartIcon.style.color = 'transparent';
+          heartIcon.style.opacity = '0';
+        }
+      });
 
-      // 🔥 Llamamos a Lazy loaderr después de agregar las imágenes dinámicamente
+      imgContainer.appendChild(img);
+      imgContainer.appendChild(heartIcon);
+
+      const title = document.createElement('h5');
+      title.textContent = movie.title;
+
+      movieCard.appendChild(imgContainer);
+      movieCard.appendChild(title);
+
+      // Cambiar hash al tocar la tarjeta
+      movieCard.addEventListener('click', () => {
+        location.hash = '#movie' + movie.id;
+      });
+
+      movieContainer.appendChild(movieCard);
       lazyLoader();
     });
-
   } catch (error) {
-    console.error('Ocurrió un problema:', error); // Si ocurrió un error mostrarlo en la consola
+    console.error('Ocurrió un problema:', error);
   }
 };
 
 getMoviesProximmamente();
-
 
 const getPopularMovie = async () => {
   // Buscar el contenedor donde se muestran las peliculas
@@ -126,43 +160,84 @@ const getPopularMovie = async () => {
 
   try {
     let { data } = await api('/movie/popular', { params: { language: 'es' } });
-
-    // Si no hay resultados en Español, intenta obtener en inglés
     if (!data.results || data.results.length === 0) {
       ({ data } = await api('/movie/popular', { params: { language: 'en-US' } }));
     }
 
-    const movies = data.results;   // Almacenar la respuesta las peliculas
-    movieContainer.innerHTML = ''; // Limpiar cualquier contenido previo del contenedor
+    const movies = data.results;
+    movieContainer.innerHTML = '';
 
-    // Mostrar las 6 primeras peliculas
-    movies.slice(0, 6).forEach(movie => {  // Limitar a 6 peliculas
-      const movieCard = document.createElement('div');  // Crear el contenedor de cada película
-      movieCard.classList.add('movie-card'); // Agregar la clase 'movie-card'
+    movies.slice(0, 6).forEach(movie => {
+      const movieCard = document.createElement('div');
+      movieCard.classList.add('movie-card');
+      movieCard.style.position = 'relative';
 
-      // Rellenar el contenedor con la imagen y título de la película
-      movieCard.innerHTML = ` 
-        <img data-src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
-        <h5>${movie.title}</h5>
-      `;
+      // Contenedor de la imágen + el corazon
+      const imgContainer = document.createElement('div');
+      imgContainer.style.position = 'relative';
+      imgContainer.style.display = 'inline-block';
 
-      // Agregar el evento de clic para actualizar el hash
-      movieCard.addEventListener('click', () => {
-        location.hash = '#movie' + movie.id;  // Actualiza el hash con el ID de la película
+      const img = document.createElement('img');
+      img.setAttribute('data-src', `https://image.tmdb.org/t/p/original${movie.poster_path}`);
+      img.alt = movie.title;
+
+      const heartIcon = document.createElement('span');
+      heartIcon.innerHTML = '❤️';
+      heartIcon.classList.add('heart-icon');
+      heartIcon.style.opacity = '0';
+      heartIcon.style.position = 'auto';
+
+      // Mostrar el corazón al pasar el mouse
+      imgContainer.addEventListener('mouseenter', () => {
+        if (!heartIcon.classList.contains('liked')) {
+          heartIcon.style.opacity = '1';
+          heartIcon.style.color = 'rgba(255, 255, 255, 0.4)';
+        }
+      })
+      imgContainer.addEventListener('mouseleave', () => {
+        if (!heartIcon.classList.contains('liked')) {
+          heartIcon.style.opacity = '0';
+          heartIcon.style.color = 'transparent';
+        }
+      })
+
+      // Toggle real del corazón
+      heartIcon.addEventListener('click', e => {
+        e.stopPropagation();
+        heartIcon.classList.toggle('liked');
+        if (heartIcon.classList.contains('liked')) {
+          heartIcon.style.color = 'red';
+          heartIcon.style.opacity = '1'
+        } else {
+          heartIcon.style.color = 'transparent';
+          heartIcon.style.opacity = '0';
+        }
       });
 
-      // Agregar la tarjeta de cada película al contenedor
+      imgContainer.appendChild(img);
+      imgContainer.appendChild(heartIcon);
+
+      const title = document.createElement('h5');
+      title.textContent = movie.title;
+
+      movieCard.appendChild(imgContainer);
+      movieCard.appendChild(title);
+
+
+      // Cambiar hash al tocar la tarjeta
+      movieCard.addEventListener('click', () => {
+        location.hash = '#movie' + movie.id;
+      })
+
+
       movieContainer.appendChild(movieCard);
-
-      // 🔥 Llamamos a lazyLoader  después de agregar las imágenes dinámicamente
       lazyLoader();
-    });
-
+    })
   } catch (error) {
-    console.error('Ocurrió un problema:', error); // Si ocurrió un error mostrarlo en la consola
+    console.error('Ocurrió un problema:', error);
   }
-};
 
+};
 getPopularMovie();
 
 const getTredingMovies = async () => {
@@ -183,7 +258,6 @@ const getTredingMovies = async () => {
 
   try {
     let { data } = await api('trending/movie/week', { params: { language: 'es' } });
-
     // Si no hay resultados en Español, intenta obtener en inglés
     if (!data.results || data.results.length === 0) {
       ({ data } = await api('trending/movie/week', { params: { language: 'en-US' } }));
@@ -197,28 +271,69 @@ const getTredingMovies = async () => {
       const movieCard = document.createElement('div');  // Crear el contenedor de cada película
       movieCard.classList.add('movie-card'); // Agregar la clase 'movie-card'
 
-      // Rellenar el contenedor con la imagen y título de la película
-      movieCard.innerHTML = ` 
-        <img data-src="https://image.tmdb.org/t/p/original${movie.poster_path}" alt="${movie.title}">
-        <h5>${movie.title}</h5>
-      `;
+      // Contenedor de la imágen + el corazon
+      const imgContainer = document.createElement('div');
+      imgContainer.style.position = 'relative';
+      imgContainer.style.display = 'inline-block';
 
-      // Agregar el evento de clic para actualizar el hash
-      movieCard.addEventListener('click', () => {
-        location.hash = '#movie' + movie.id;  // Actualiza el hash con el ID de la película
+      const img = document.createElement('img');
+      img.setAttribute('data-src', `https://image.tmdb.org/t/p/original${movie.poster_path}`);
+      img.alt = movie.title;
+
+      const heartIcon = document.createElement('span');
+      heartIcon.innerHTML = '❤️';
+      heartIcon.classList.add('heart-icon');
+      heartIcon.style.opacity = '0';
+      heartIcon.style.position = 'auto';
+
+      // Mostrar el corazón al pasar el mouse
+      imgContainer.addEventListener('mouseenter', () => {
+        if (!heartIcon.classList.contains('liked')) {
+          heartIcon.style.opacity = '1';
+          heartIcon.style.color = 'rgba(255, 255, 255, 0.4)';
+        }
+      })
+      imgContainer.addEventListener('mouseleave', () => {
+        if (!heartIcon.classList.contains('liked')) {
+          heartIcon.style.opacity = '0'
+          heartIcon.style.color = 'transparent';
+        }
+      })
+
+      // Toggle real del corazón
+      heartIcon.addEventListener('click', e => {
+        e.stopPropagation();
+        heartIcon.classList.toggle('liked');
+        if (heartIcon.classList.contains('liked')) {
+          heartIcon.style.color = 'red';
+          heartIcon.style.opacity = '1';
+        } else {
+          heartIcon.style.color = 'transparent';
+          heartIcon.style.opacity = '0';
+        }
       });
 
-      // Agregar la tarjeta de cada película al contenedor
+      imgContainer.appendChild(img);
+      imgContainer.appendChild(heartIcon);
+
+      const title = document.createElement('h5');
+      title.textContent = movie.title;
+
+      movieCard.appendChild(imgContainer);
+      movieCard.appendChild(title);
+
+      // Cambiar hash al tocar la tarjeta
+      movieCard.addEventListener('click', () => {
+        location.hash = '#movie' + movie.id;
+      })
+
       movieContainer.appendChild(movieCard);
-
-      // 🔥 Llamamos a lazyLoader después de agregar las imágenes dinámicamente
       lazyLoader();
-    });
-
+    })
   } catch (error) {
-    console.error('Ocurrió un problema:', error); // Si ocurrió un error mostrarlo en la consola
+    console.error('Ocurrió un problema:', error);
   }
-};
+}
 
 // Función asíncrona para mostrar las categorías de las películas
 const getCategoriesPreview = async () => {
@@ -400,6 +515,7 @@ const getMoviesSearch = async (query) => {
     bannerSection.classList.add('d-none');
     tendenciasSection.classList.add('d-none');
     popularesSection.classList.add('d-none');
+    likedSection.classList.add('d-none');
     proximamenteSection.classList.add('d-none');
 
     // Mostrar la sección de búsqueda
@@ -600,7 +716,7 @@ const getMoviesCategory = async (id) => {
 
     const peliculasParaMostrar = allMovies.slice(0, limitePeliculasCategory);
 
-    
+
 
     peliculasParaMostrar.forEach(movie => {
       // Crear el elemento de imagen con manejo de error
@@ -638,7 +754,7 @@ const getMoviesCategory = async (id) => {
       moviesContainer.appendChild(movieCard);
     });
 
- 
+
     totalPeliculasCargadasCategory = peliculasParaMostrar.length;
     // 🔥 Llamamos a lazyLoader después de agregar las imágenes dinámicamente
     lazyLoader();
@@ -728,72 +844,72 @@ const getPaginatedMoviesByCategory = (id) => {
         }).then(res => res.data.results || []),
       ]);
 
-     page++;
+      page++;
 
-    // Filtrar duplicados usando el Set global
-    const nuevasPeliculas = [...pelisEs, ...pelisEN].filter(movie => !seenMovieIds.has(movie.id));
-    nuevasPeliculas.forEach(movie => seenMovieIds.add(movie.id));
+      // Filtrar duplicados usando el Set global
+      const nuevasPeliculas = [...pelisEs, ...pelisEN].filter(movie => !seenMovieIds.has(movie.id));
+      nuevasPeliculas.forEach(movie => seenMovieIds.add(movie.id));
 
-    const peliculasDisponibles = nuevasPeliculas.slice(0, limitePeliculasCategory - totalPeliculasCargadasCategory);
+      const peliculasDisponibles = nuevasPeliculas.slice(0, limitePeliculasCategory - totalPeliculasCargadasCategory);
 
-    const moviesContainer = document.querySelector('.movies-grid-container-category');
-    ocultarskeletoncategory();
+      const moviesContainer = document.querySelector('.movies-grid-container-category');
+      ocultarskeletoncategory();
 
-    peliculasDisponibles.forEach(movie => {
-      const movieCard = document.createElement('div');
-      movieCard.classList.add('movie-card');
+      peliculasDisponibles.forEach(movie => {
+        const movieCard = document.createElement('div');
+        movieCard.classList.add('movie-card');
 
-      const img = document.createElement('img');
-      img.src = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
-      img.onerror =  () => {
-        img.src = 'img/Brak OBRAZU.png';
-      }
+        const img = document.createElement('img');
+        img.src = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+        img.onerror = () => {
+          img.src = 'img/Brak OBRAZU.png';
+        }
 
-      const title = document.createElement('h5');
-      title.textContent = movie.title;
+        const title = document.createElement('h5');
+        title.textContent = movie.title;
 
-      const link = document.createElement('a');
-      link.href =`https://www.themoviedb.org/movie/${movie.id}`;
-      link.target = '_blank';
+        const link = document.createElement('a');
+        link.href = `https://www.themoviedb.org/movie/${movie.id}`;
+        link.target = '_blank';
 
 
-      movieCard.appendChild(img);
-      movieCard.appendChild(title);
-      movieCard.appendChild(link);
+        movieCard.appendChild(img);
+        movieCard.appendChild(title);
+        movieCard.appendChild(link);
 
-      movieCard.addEventListener('click', () => {
-        history.pushState(null, '', '#movie' + movie.id);  
+        movieCard.addEventListener('click', () => {
+          history.pushState(null, '', '#movie' + movie.id);
+        });
+
+        moviesContainer.appendChild(movieCard);
       });
 
-      moviesContainer.appendChild(movieCard);
-    });
 
- 
-    totalPeliculasCargadasCategory += peliculasDisponibles.length;
-    lazyLoader();
-  } catch (error) {
-    console.error('Error cargando películas por categoría:', error);
-  } finally {
-    isLoading = false;
+      totalPeliculasCargadasCategory += peliculasDisponibles.length;
+      lazyLoader();
+    } catch (error) {
+      console.error('Error cargando películas por categoría:', error);
+    } finally {
+      isLoading = false;
 
-  }
-};
+    }
+  };
 
-const onScroll = () => {
-  const { scrollTop, scrollHeight, clientHeight} = document.documentElement;
-  if (scrollTop + clientHeight >= scrollHeight - 150) {
+  const onScroll = () => {
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+    if (scrollTop + clientHeight >= scrollHeight - 150) {
       CargarMasPeliculas();
+    }
+  };
+
+  if (!scrollActivo) {
+    window.removeEventListener('scroll', onScroll);
+    window.addEventListener('scroll', onScroll);
+    scrollActivo = true;
   }
-};
-
-if (!scrollActivo) {
-  window.removeEventListener('scroll', onScroll);
-  window.addEventListener('scroll', onScroll);
-  scrollActivo = true;
-}
 
 
-CargarMasPeliculas();
+  CargarMasPeliculas();
 
 };
 
