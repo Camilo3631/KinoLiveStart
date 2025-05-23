@@ -374,6 +374,13 @@ h5 {
   padding: 10px 0;
 }
 
+.movies-container-favourites-movies {
+  display: flex;
+  overflow-x: auto;
+  gap: 15px;
+  padding: 10px 0;
+}
+
 
 .movies-container-proximamente {
   display: flex;
@@ -998,17 +1005,6 @@ footer {
   z-index: 10; /* Asegúrate de que no sea cubierto por otros elementos */
 }
 
-
-.movie-card {
-  width: 200px; /* Ajusta el tamaño que necesites */
-  margin: 10px;
-}
-
-.movie-card img {
-  display: block;
-  width: 100%;
-  border-radius: 8px;
-}
 
 
 .heart-icon {

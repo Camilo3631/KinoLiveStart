@@ -515,6 +515,7 @@ const getMoviesSearch = async (query) => {
     bannerSection.classList.add('d-none');
     tendenciasSection.classList.add('d-none');
     popularesSection.classList.add('d-none');
+    likedSection.classList.add('d-none');
     proximamenteSection.classList.add('d-none');
 
     // Mostrar la sección de búsqueda

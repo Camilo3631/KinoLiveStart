@@ -25,6 +25,7 @@ const showMoreProximamneteButton = document.getElementById('show-more-proximamen
 const tendenciasSection = document.getElementById('tendencias');
 const popularesSection = document.getElementById('populares');
 const proximamenteSection = document.getElementById('proximamente');
+const likedSection = document.getElementById('liked');
 const categoryGridSection = document.getElementById('category-grid-container');
 
 const botones = document.querySelectorAll('.btn-polish-white-ms-3');
