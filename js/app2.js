@@ -11,6 +11,32 @@ const api = axios.create({
   },
 })
 
+
+
+const addLikedMovie = (movie) => {
+  const liked = JSON.parse(localStorage.getItem('likedMovies')) || {};
+  liked[movie.id] = movie;
+  localStorage.setItem('likedMovies', JSON.stringify(liked));
+  getLikedMovies();  // Actualiza la UI inmediatamente
+};
+
+const removeLikedMovie = (movieId) => {
+  const liked = JSON.parse(localStorage.getItem('likedMovies')) || {};
+  delete liked[movieId];
+  localStorage.setItem('likedMovies', JSON.stringify(liked));
+  getLikedMovies();  // Actualiza la UI inmediatamente
+};
+
+
+// Función para obtener todas las películas favoritas
+const likedMoviesList = () => {
+  return JSON.parse(localStorage.getItem('likedMovies')) || {};
+};
+
+
+
+
+
 // Función para lazy loading (Carga peresosa
 const lazyLoader = () => {
   // Selecciónamos todas las imágenes
@@ -64,6 +90,7 @@ const getMoviesProximmamente = async () => {
     movieContainer.appendChild(loadingCard);
   }
 
+
   try {
     let { data } = await api('/movie/upcoming', { params: { language: 'es' } });
     if (!data.results || data.results.length === 0) {
@@ -90,7 +117,8 @@ const getMoviesProximmamente = async () => {
       heartIcon.innerHTML = '❤️';
       heartIcon.classList.add('heart-icon');
 
-
+     
+      
       // Mostrar el corazón al pasar el mouse
       imgContainer.addEventListener('mouseenter', () => {
         if (!heartIcon.classList.contains('liked')) {
@@ -112,9 +140,11 @@ const getMoviesProximmamente = async () => {
         if (heartIcon.classList.contains('liked')) {
           heartIcon.style.color = 'red';
           heartIcon.style.opacity = '1';
+          addLikedMovie(movie);      // AGREGAR a favoritos
         } else {
           heartIcon.style.color = 'transparent';
           heartIcon.style.opacity = '0';
+          removeLikedMovie(movie.id); // ELIMINAR de favoritos
         }
       });
 
@@ -208,9 +238,11 @@ const getPopularMovie = async () => {
         if (heartIcon.classList.contains('liked')) {
           heartIcon.style.color = 'red';
           heartIcon.style.opacity = '1'
+          addLikedMovie(movie);      // AGREGAR a favoritos
         } else {
           heartIcon.style.color = 'transparent';
           heartIcon.style.opacity = '0';
+          removeLikedMovie(movie.id); // ELIMINAR de favoritos
         }
       });
 
@@ -307,9 +339,11 @@ const getTredingMovies = async () => {
         if (heartIcon.classList.contains('liked')) {
           heartIcon.style.color = 'red';
           heartIcon.style.opacity = '1';
+          addLikedMovie(movie)
         } else {
           heartIcon.style.color = 'transparent';
           heartIcon.style.opacity = '0';
+          removeLikedMovie(movie.id)
         }
       });
 
@@ -912,12 +946,6 @@ const getPaginatedMoviesByCategory = (id) => {
   CargarMasPeliculas();
 
 };
-
-
-
-
-
-
 
 
 
@@ -1637,3 +1665,5 @@ const generarGridMoviesProximamente = () => {
 };
 
 generarGridMoviesProximamente();
+
+

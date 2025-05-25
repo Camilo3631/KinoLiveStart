@@ -95,6 +95,8 @@ const homePage = () => {
   generarGridMoviesTendencias();
   generarGridMoviesPopulares();
   generarGridMoviesProximamente();
+   getLikedMovies();
+
 
 
 
@@ -330,7 +332,6 @@ const categoriesPage = () => {
 
 
   };
-
 
 
   // Función para el slider y grid de tendencias
