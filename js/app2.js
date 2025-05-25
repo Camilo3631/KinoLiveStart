@@ -1667,3 +1667,88 @@ const generarGridMoviesProximamente = () => {
 generarGridMoviesProximamente();
 
 
+// función para guardar en favoritos 
+const getLikedMovies = () => {
+  const likedMovies = likedMoviesList(); // Obtener desde localStorage
+  const  MoviesArray = Object.values(likedMovies); // Convertir a array
+
+  const movieContainer = document.querySelector('.movies-container-favourites-movies');
+  if (!movieContainer) {
+     console.error('No se encontró el contenedor de películas favoritas.')
+     return;
+  }
+
+ movieContainer.innerHTML = ''; // Limpiar contenido previo
+
+ if (MoviesArray.length === 0) {
+    return;
+ };
+
+ MoviesArray.forEach(movie => {
+     const movieCard = document.createElement('div');
+     movieCard.classList.add('movie-card');
+     movieCard.style.position = 'relative';
+
+    const imgContainer = document.createElement('div');
+    imgContainer.style.position = 'relative';
+    imgContainer.style.display = 'inline-block';
+
+    const img = document.createElement('img');
+    img.setAttribute('data-src', `https://image.tmdb.org/t/p/original${movie.poster_path}`);
+    img.alt = movie.title;
+
+    const heartIcon = document.createElement('span');
+    heartIcon.innerHTML = '❤️';
+    heartIcon.classList.add('heart-icon', 'liked');
+    heartIcon.style.color = 'red';
+    heartIcon.style.opacity = '1';
+
+    heartIcon.addEventListener('click', e  => {
+      e.stopPropagation();
+      removeLikedMovie(movie.id);
+      getLikedMovies();
+    });
+
+    imgContainer.appendChild(img);
+    imgContainer.appendChild(heartIcon);
+
+    const title = document.createElement('h5');
+    title.textContent = movie.title;
+    
+    movieCard.appendChild(imgContainer);
+    movieCard.appendChild(title);
+
+    movieCard.addEventListener('clck', () => {
+      location.hash = '#movie' + movie.id;
+    });
+
+    movieContainer.appendChild(movieCard);
+  });
+
+  lazyLoader();
+};
+
+
+window.addEventListener('storage', () => {
+  getLikedMovies(); // vuelve a cargar las películas favoritas inmediatamente
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+

@@ -95,7 +95,7 @@ const homePage = () => {
   generarGridMoviesTendencias();
   generarGridMoviesPopulares();
   generarGridMoviesProximamente();
-   getLikedMovies();
+  getLikedMovies();
 
 
 
