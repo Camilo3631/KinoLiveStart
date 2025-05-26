@@ -76,6 +76,9 @@ const lazyLoader = () => {
 };
 
 const getMoviesProximmamente = async () => {
+
+  const idioma = localStorage.getItem('idioma') || 'es';
+
   const movieContainer = document.querySelector('.movies-container-proximamente');
   if (!movieContainer) {
     console.error('No se encontró el contenedor de peliculas.');
@@ -92,7 +95,7 @@ const getMoviesProximmamente = async () => {
 
 
   try {
-    let { data } = await api('/movie/upcoming', { params: { language: 'es' } });
+    let { data } = await api('/movie/upcoming', { params: { language: idioma } });
     if (!data.results || data.results.length === 0) {
       ({ data } = await api('/movie/upcoming', { params: { language: 'en-US' } }));
     }
@@ -172,8 +175,11 @@ const getMoviesProximmamente = async () => {
 
 getMoviesProximmamente();
 
-const getPopularMovie = async () => {
+const getPopularMovies = async () => {
   // Buscar el contenedor donde se muestran las peliculas
+  const idioma = localStorage.getItem('idioma') || 'es';
+
+
   const movieContainer = document.querySelector('.movies-container-pupular');
   if (!movieContainer) {
     console.error('No se encontró el contenedor de peliculas.');
@@ -189,7 +195,7 @@ const getPopularMovie = async () => {
   }
 
   try {
-    let { data } = await api('/movie/popular', { params: { language: 'es' } });
+    let { data } = await api('/movie/popular', { params: { language: idioma } });
     if (!data.results || data.results.length === 0) {
       ({ data } = await api('/movie/popular', { params: { language: 'en-US' } }));
     }
@@ -270,10 +276,13 @@ const getPopularMovie = async () => {
   }
 
 };
-getPopularMovie();
+getPopularMovies();
 
 const getTredingMovies = async () => {
   // Buscar el contenedor donde se muestran las peliculas
+  const idioma = localStorage.getItem('idioma') || 'es';
+
+
   const movieContainer = document.querySelector('.movies-container-tedencias');
   if (!movieContainer) {
     console.error('No se encontró el contenedor de peliculas.');
@@ -289,7 +298,7 @@ const getTredingMovies = async () => {
   }
 
   try {
-    let { data } = await api('trending/movie/week', { params: { language: 'es' } });
+    let { data } = await api('trending/movie/week', { params: { language: idioma } });
     // Si no hay resultados en Español, intenta obtener en inglés
     if (!data.results || data.results.length === 0) {
       ({ data } = await api('trending/movie/week', { params: { language: 'en-US' } }));
@@ -369,50 +378,38 @@ const getTredingMovies = async () => {
   }
 }
 
-// Función asíncrona para mostrar las categorías de las películas
-const getCategoriesPreview = async () => {
-
+const getCategoriesPreview = async (idioma = 'es') => {
   try {
-    // Peticion a la API para la lista de generos Español
-    const { data } = await api.get('genre/movie/list', { params: { language: 'es' } });
+    const { data } = await api.get('genre/movie/list', {
+      params: { language: idioma }
+    });
 
     if (!data || !data.genres) throw new Error('Error al obtener las categorías');
 
     const categoryList = document.getElementById('dynamicCategoriesList');
-    categoryList.innerHTML = ''; // Limpia el contenido previo
+    categoryList.innerHTML = '';
 
-    // Mostrar todas las categorías en dos filas sin contendor adicional
     data.genres.forEach(category => {
       const li = document.createElement('li');
       li.classList.add('category-item');
       li.innerHTML = `<a href="#" data-category-id="${category.id}" data-category-name="${category.name}">${category.name}</a>`;
 
-      // Agregar el evento de click al actualizar el hash y llamar a la función de las películas de la categoría
       li.addEventListener('click', (event) => {
-        event.preventDefault();  // Prevenir la acción por defecto del <a>
-
-        const categoryId = category.id; // Usamos el id directamente de la categoría
-        const categoryName = category.name; // Usamos el nombre directamente de la categoría
-
-        // Mostramos el nombre y el ID de la categoría seleccionada en el log
-        console.log(`Categoría seleccionada: ${category.name} (ID: ${categoryId})`);
-
-        // Actualizar el hash con el formato deseado: #category=ID-NOMBRE
+        event.preventDefault();
+        const categoryId = category.id;
+        const categoryName = category.name;
         window.location.hash = `category=${categoryId}-${categoryName}`;
-
-        // Llamar a la función para mostrar películas de la categoría
         getMoviesCategory(categoryId);
       });
 
-
       categoryList.appendChild(li);
-
     });
 
   } catch (error) {
-    console.error('Error', error);
+    console.error('Error cargando categorías:', error);
   }
 };
+
 
 // Referencia los elemmentos del DOM
 const menuToggle = document.getElementById('navbarDropdown');
@@ -1006,11 +1003,17 @@ document.addEventListener('click', async (e) => {
 
 // Función general para obtener los detalles de una película por ID
 const getMovieDetailsById = async (id) => {
+  currentMovieId = id; // Guardar ID globalmente para recarga
+  const idioma = localStorage.getItem('idioma') || 'es';
+
 
   try {
+
+   
+
     const movieRes = await api('movie/' + id, {
       params: {
-        language: 'es',
+        language: idioma,
       }
 
     });
@@ -1107,17 +1110,25 @@ const resetDetailView = () => {
 
 // Cargar géneros y recomendaciones
 const fetchGenresAndRecommendations = async (id) => {
+  const idioma = localStorage.getItem('idioma') || 'es';
+  const textos = traducciones[idioma] || traducciones['es']; // fallback a españo
+
   const categoriesContainer = document.getElementById('movie-categories');
   const similaresContainer = document.getElementById('movie-similares');
 
   categoriesContainer.innerHTML = '';
   similaresContainer.innerHTML = '';
 
+ 
+
+
   try {
+  
+
 
     const [detailRes, recommendationsRes] = await Promise.all([
-      api(`movie/${id}`, { params: { language: 'es' } }),  // Usamos 'id' en lugar de 'movieId'
-      api(`movie/${id}/recommendations`, { params: { language: 'es' } })  // También se cambia aquí a 'id'
+      api(`movie/${id}`, { params: { language: idioma } }),  // Usamos 'id' en lugar de 'movieId'
+      api(`movie/${id}/recommendations`, { params: { language: idioma } })  // También se cambia aquí a 'id'
     ]);
 
     const detailData = detailRes.data;
@@ -1316,6 +1327,9 @@ const mostrarSkeletonstendecias = () => {
 
 // Ocultar skeletons
 const ocultarskeletontendecias = () => {
+
+
+
   const moviesContainer = gridTendenciasSection.querySelector('.movies-grid-container');
   const skeletons = moviesContainer.querySelectorAll('.loading-card-grid');
   skeletons.forEach(skeleton => skeleton.remove());
@@ -1732,23 +1746,115 @@ const getLikedMovies = () => {
 window.addEventListener('storage', () => {
   getLikedMovies(); // vuelve a cargar las películas favoritas inmediatamente
 });
+// Traducciones para los títulos
+const traducciones = {
+  es: {
+    tendencias: 'Películas en Tendencia',
+    populares: 'Películas Populares',
+    proximamente: 'Películas Próximamente',
+    categorias: 'Categorías:',
+    recomendadas: 'Películas Recomendadas'
+  },
+  en: {
+    tendencias: 'Trending Movies',
+    populares: 'Popular Movies',
+    proximamente: 'Upcoming Movies',
+    categorias: 'Categories:',
+    recomendadas: 'Recommended Movies'
+  },
+  pl: {
+    tendencias: 'Filmy na czasie',
+    populares: 'Popularne filmy',
+    proximamente: 'Nadchodzące filmy',
+    categorias: 'Kategorie:',
+    recomendadas: 'Polecane filmy'
+  },
+  fr: {
+    tendencias: 'Films Tendance',
+    populares: 'Films Populaires',
+    proximamente: 'Films à Venir',
+    categorias: 'Catégories :',
+    recomendadas: 'Films Recommandés'
+  }
+};
 
+// Cambiar los textos visibles en el DOM según idioma
+function cambiarIdiomaTextos(idioma) {
+  const textos = traducciones[idioma];
+  if (!textos) {
+    console.warn(`Idioma no soportado: ${idioma}`);
+    return;
+  }
 
+  const tend = document.querySelector('.grid-tendencias-title');
+  const pop = document.querySelector('.grid-populares-title');
+  const prox = document.querySelector('.grid-proximamente-title');
 
+  if (tend) tend.textContent = textos.tendencias;
+  if (pop) pop.textContent = textos.populares;
+  if (prox) prox.textContent = textos.proximamente;
 
+  // Si ya estás en la vista de detalles, actualiza textos internos
+  const categoriasTitulo = document.querySelector('#movie-categories h4');
+  const recomendadasTitulo = document.querySelector('#movie-similares h4');
+  if (categoriasTitulo) categoriasTitulo.textContent = textos.categorias;
+  if (recomendadasTitulo) recomendadasTitulo.textContent = textos.recomendadas;
+}
 
+// Variables y elementos para manejar el cambio de idioma
+const languageSwitch = document.getElementById('languageSwitch');
+const langLabels = ['es', 'en', 'pl', 'fr'];  // Códigos de idiomas
+let currentIndex = 0;
 
+// Leer idioma guardado o usar por defecto
+const savedIdioma = localStorage.getItem('idioma');
+if (savedIdioma) {
+  const index = langLabels.indexOf(savedIdioma);
+  currentIndex = index !== -1 ? index : 0;
+}
 
+// Actualizar estilos de las etiquetas al idioma activo
+function updateLabel() {
+  const spans = document.querySelectorAll('#languageSwitch + label span');
+  spans.forEach((span, i) => {
+    if (i === currentIndex) {
+      span.style.fontWeight = 'bold';
+      span.style.color = 'gray';
+    } else {
+      span.style.fontWeight = 'normal';
+      span.style.color = 'white';
+    }
+  });
+}
 
+// Variable global para saber si estás en detalle
+let currentMovieId = null;
 
+// Actualizar contenido con el nuevo idioma
+function actualizarPeliculas() {
+  const idioma = langLabels[currentIndex];
+  localStorage.setItem('idioma', idioma);
 
+  cambiarIdiomaTextos(idioma);
+  getTredingMovies(idioma);
+  getMoviesProximmamente(idioma);
+  getPopularMovies(idioma);
+  getCategoriesPreview(idioma);
 
+  // Si estás en vista de detalle, recargar la película actual
+  const visible = !movieDetailSection.classList.contains('d-none');
+  if (visible && currentMovieId) {
+    getMovieDetailsById(currentMovieId); // Recarga con idioma nuevo
+  }
+}
 
+// Evento click para cambiar idioma
+languageSwitch.addEventListener('click', () => {
+  currentIndex = (currentIndex + 1) % langLabels.length;
+  updateLabel();
+  actualizarPeliculas();
+});
 
-
-
-    
-
-
-
-
+// Al iniciar la página, actualizar labels y cargar películas
+updateLabel();
+actualizarPeliculas();
