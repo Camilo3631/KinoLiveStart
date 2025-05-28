@@ -29,8 +29,7 @@ h5 {
  font-family: "Zilla Slab", serif;
 }
 /* Baner */
-
-/* Baner */
+/*
 .hero {
   position: relative;
   background-image: url('https://image.tmdb.org/t/p/original/9gejC4iPpgV0pO2OYrBrUE1rWO.jpg');
@@ -42,6 +41,21 @@ h5 {
   align-items: flex-end;
   padding: 40px;   
 }
+*/
+
+.hero {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  height: 120vh;  /* o ajusta si quieres */
+  width: 100vw;
+  display: flex;
+  align-items: flex-end;
+  padding: 40px;
+  transition: background-image 0.8s ease-in-out; /* para que el cambio sea suave */
+}
+
+
 
 .hero-content {
   max-width: 600px;
@@ -52,12 +66,15 @@ h5 {
   font-weight: bold;
 }
 
-.hero p {
- font-size: 1.2rem;
- margin-bottom: 20px;
- color: black;
- font-weight: bold;
+.hero-text {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+ 
+  color: white;
+  font-weight: bold !important;
 }
+
+
 
 .container-fluid {
   padding: 0;

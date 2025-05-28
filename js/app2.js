@@ -120,8 +120,8 @@ const getMoviesProximmamente = async () => {
       heartIcon.innerHTML = '❤️';
       heartIcon.classList.add('heart-icon');
 
-     
-      
+
+
       // Mostrar el corazón al pasar el mouse
       imgContainer.addEventListener('mouseenter', () => {
         if (!heartIcon.classList.contains('liked')) {
@@ -483,9 +483,12 @@ const ocultarskeletoncategory = () => {
 let totalPeliculasMostradasBuscadas = 0;
 const limitePeliculasBuscadas = 160;
 let peliculasMostradasBusquedas = [];
+// Ejemplo: cambiar idioma a inglés
+
 
 // Función asincrona para obtener la película según su búsqueda
 const getMoviesSearch = async (query) => {
+
 
   try {
     const { data } = await api('/search/movie', {
@@ -673,33 +676,100 @@ let totalPeliculasCargadasCategory = 0;
 const limitePeliculasCategory = 80;
 const seenMovieIds = new Set(); // también global para evitar duplicados
 
+
 // Función para obtener películas por categoría
 const getMoviesCategory = async (id) => {
   try {
     const genereMap = {
-      28: 'Acción',
-      12: 'Aventura',
-      16: 'Animación',
-      35: 'Comedia',
-      80: 'Fantasía',
-      99: 'Documental',
-      18: 'Drama',
-      10751: 'Familiar',
-      14: 'Fantasia',
-      36: 'Historia',
-      27: 'Terror',
-      10402: 'Música',
-      9648: 'Misterio',
-      10749: 'Romance',
-      878: 'Ciencia ficción',
-      10770: 'Película de tv',
-      53: 'Suspenso',
-      10752: 'Bélica',
-      37: 'Western',
+      es: {
+        28: 'Acción',
+        12: 'Aventura',
+        16: 'Animación',
+        35: 'Comedia',
+        80: 'Fantasía',
+        99: 'Documental',
+        18: 'Drama',
+        10751: 'Familiar',
+        14: 'Fantasía',
+        36: 'Historia',
+        27: 'Terror',
+        10402: 'Música',
+        9648: 'Misterio',
+        10749: 'Romance',
+        878: 'Ciencia ficción',
+        10770: 'Película de TV',
+        53: 'Suspenso',
+        10752: 'Bélica',
+        37: 'Western',
+      },
+      en: {
+        28: 'Action',
+        12: 'Adventure',
+        16: 'Animation',
+        35: 'Comedy',
+        80: 'Fantasy',
+        99: 'Documentary',
+        18: 'Drama',
+        10751: 'Family',
+        14: 'Fantasy',
+        36: 'History',
+        27: 'Horror',
+        10402: 'Music',
+        9648: 'Mystery',
+        10749: 'Romance',
+        878: 'Science Fiction',
+        10770: 'TV Movie',
+        53: 'Thriller',
+        10752: 'War',
+        37: 'Western',
+      },
+      pl: {
+        28: 'Akcja',
+        12: 'Przygoda',
+        16: 'Animacja',
+        35: 'Komedia',
+        80: 'Fantasy',
+        99: 'Dokumentalny',
+        18: 'Dramat',
+        10751: 'Rodzinny',
+        14: 'Fantasy',
+        36: 'Historyczny',
+        27: 'Horror',
+        10402: 'Muzyka',
+        9648: 'Tajemnica',
+        10749: 'Romans',
+        878: 'Science fiction',
+        10770: 'Film TV',
+        53: 'Thriller',
+        10752: 'Wojenny',
+        37: 'Western',
+      },
+      fr: {
+        28: 'Action',
+        12: 'Aventure',
+        16: 'Animation',
+        35: 'Comédie',
+        80: 'Fantastique',
+        99: 'Documentaire',
+        18: 'Drame',
+        10751: 'Familial',
+        14: 'Fantaisie',
+        36: 'Histoire',
+        27: 'Horreur',
+        10402: 'Musique',
+        9648: 'Mystère',
+        10749: 'Romance',
+        878: 'Science-fiction',
+        10770: 'Téléfilm',
+        53: 'Thriller',
+        10752: 'Guerre',
+        37: 'Western',
+      }
     };
 
-    // Si el ID no está en el mapa, salimos silenciosamente
-    if (!genereMap[id]) return;
+    const idioma = localStorage.getItem('idioma') || 'es';
+    const categoriasPorIdioma = genereMap[idioma] || genereMap['es'];
+    if (!categoriasPorIdioma[id]) return;
 
     // Mostrar sección y skeletons
     const categoryGridSection = document.getElementById('category-grid-container');
@@ -716,6 +786,10 @@ const getMoviesCategory = async (id) => {
     proximamenteSection.classList.add('d-none');
     movieSliders.forEach(slider => slider.classList.add('d-none'));
 
+    // Cambiar el título de la categoría
+    const categoryTitle = document.querySelector('.grid-category-title');
+    categoryTitle.textContent = `Películas por categoría ${categoriasPorIdioma[id]}`;
+
     // Función auxiliar para buscar por idioma
     const fetchByLanguage = async (lang) => {
       const response = await api('discover/movie', {
@@ -728,66 +802,51 @@ const getMoviesCategory = async (id) => {
       return response.data.results || [];
     };
 
-    // Buscar películas en español e inglés al mismo tiempo
-    const [pelisEs, pelisEN] = await Promise.all([
-      fetchByLanguage('es'),
+    // Buscar películas en idioma actual y en inglés
+    const [pelisIdioma, pelisEN] = await Promise.all([
+      fetchByLanguage(idioma),
       fetchByLanguage('en'),
     ]);
 
-    const allMovies = [...pelisEs, ...pelisEN];
+    const allMovies = [...pelisIdioma, ...pelisEN];
     if (allMovies.length === 0) throw new Error('No se encontraron películas');
 
-    // Cambiar el titulo de la categoría
-    const categoryTitle = document.querySelector('.grid-category-title');
-    categoryTitle.textContent = `Películas por categoría ${genereMap[id]}`;
-
-    // Ocultar los skeletons  y mostrar películas
+    // Ocultar los skeletons y mostrar las películas
     ocultarskeletoncategory();
     moviesContainer.innerHTML = '';
 
     const peliculasParaMostrar = allMovies.slice(0, limitePeliculasCategory);
 
-
-
     peliculasParaMostrar.forEach(movie => {
-      // Crear el elemento de imagen con manejo de error
       const imgElement = document.createElement('img');
       imgElement.classList.add('img-fluid', 'rounded');
       imgElement.setAttribute('src', `https://image.tmdb.org/t/p/w500${movie.poster_path}`);
-
-      // Si la imagen falla, se carga una imagen por defecto
       imgElement.onerror = () => {
         imgElement.setAttribute('src', 'img/Brak OBRAZU.png');
       };
 
-      // Crear el título de la película
       const movieTitle = document.createElement('h5');
       movieTitle.textContent = movie.title;
 
-      // Crear el enlace a la página de la película
       const movieLink = document.createElement('a');
       movieLink.href = `https://www.themoviedb.org/movie/${movie.id}`;
-      movieLink.target = '_black';
+      movieLink.target = '_blank';
 
-      // Crea la targeta de película y añadir elementos
       const movieCard = document.createElement('div');
       movieCard.classList.add('movie-card');
       movieCard.appendChild(imgElement);
       movieCard.appendChild(movieTitle);
       movieCard.appendChild(movieLink);
 
-      // Agregar el evento de clic para el historial
       movieCard.addEventListener('click', () => {
-        history.pushState(null, 'òijh', '#movie' + movie.id);
+        history.pushState(null, '', '#movie' + movie.id);
       });
 
-      // Añadir la tarjeta de película al contenedor
       moviesContainer.appendChild(movieCard);
     });
 
-
     totalPeliculasCargadasCategory = peliculasParaMostrar.length;
-    // 🔥 Llamamos a lazyLoader después de agregar las imágenes dinámicamente
+
     lazyLoader();
 
     // Mostrar botón "Ver menos"
@@ -804,19 +863,21 @@ const getMoviesCategory = async (id) => {
       location.hash = '';
     };
 
-  } catch {
+  } catch (error) {
     console.error('Error al cargar películas por categoría:', error);
     ocultarskeletoncategory();
 
     const categoryGridSection = document.getElementById('category-grid-container');
     const moviesContainer = categoryGridSection.querySelector('.movies-grid-container-category');
     moviesContainer.innerHTML = '';
+
     const errorMessage = document.createElement('div');
     errorMessage.classList.add('error-mensage');
     errorMessage.textContent = 'Lo siento, no pudimos cargar las películas en este momento';
     moviesContainer.appendChild(errorMessage);
   }
 };
+
 
 // Función para cargar más películas (paginación con scroll)
 const getPaginatedMoviesByCategory = (id) => {
@@ -1009,7 +1070,7 @@ const getMovieDetailsById = async (id) => {
 
   try {
 
-   
+
 
     const movieRes = await api('movie/' + id, {
       params: {
@@ -1119,11 +1180,11 @@ const fetchGenresAndRecommendations = async (id) => {
   categoriesContainer.innerHTML = '';
   similaresContainer.innerHTML = '';
 
- 
+
 
 
   try {
-  
+
 
 
     const [detailRes, recommendationsRes] = await Promise.all([
@@ -1281,6 +1342,8 @@ let peliculasMostradasTendencias = [];
 let paginaActualTendencias = 2; // Empieza en la 2 porque la 1 ya está cargada
 const maxPaginasTendencias = 6;  // Hasta 6 páginas
 let cargandoPeliculasTendencias = false;
+let idiomaSeleccionado = 'es'; // se pierde al recargar la página
+
 
 let totalPeliculasMostradasTendecias = 0;
 const limitePeliculasTendencias = 80;
@@ -1346,8 +1409,9 @@ const cargarPeliculasTendecias = async () => {
   cargandoPeliculasTendencias = true;
   mostrarSkeletonstendecias();
 
+  const idioma = localStorage.getItem('idioma') || 'es';
   try {
-    let response = await api('trending/movie/week', { params: { language: 'es', page: paginaActualTendencias } });
+    let response = await api('trending/movie/week', { params: { language: idioma, page: paginaActualTendencias } });
 
     if (!response.data.results || response.data.results.length === 0) {
       response = await api('trending/movie/week', { params: { language: 'en-US', page: paginaActualTendencias } });
@@ -1480,9 +1544,11 @@ const cargarPeliculasPopulares = async () => {
   cargandoPeliculasPopulares = true;
   mostrarSkeletonspopulares();
 
+  const idioma = localStorage.getItem('idioma') || 'es';
+
   try {
     let response = await api('/movie/popular', {
-      params: { language: 'es', page: paginaActualPopulares }
+      params: { language: idioma, page: paginaActualPopulares }
     });
 
     if (!response.data.results || response.data.results.length === 0) {
@@ -1610,9 +1676,11 @@ const cargarPeliculasProximamente = async () => {
   cargandoPeliculasProximamente = true;
   mostrarSkeletonsProximamente();
 
+  const idioma = localStorage.getItem('idioma') || 'es';
+
   try {
     let response = await api('/movie/upcoming', {
-      params: { language: 'es', page: paginaActualProximamente }
+      params: { language: idioma, page: paginaActualProximamente }
     });
 
     if (!response.data.results || response.data.results.length === 0) {
@@ -1684,24 +1752,24 @@ generarGridMoviesProximamente();
 // función para guardar en favoritos 
 const getLikedMovies = () => {
   const likedMovies = likedMoviesList(); // Obtener desde localStorage
-  const  MoviesArray = Object.values(likedMovies); // Convertir a array
+  const MoviesArray = Object.values(likedMovies); // Convertir a array
 
   const movieContainer = document.querySelector('.movies-container-favourites-movies');
   if (!movieContainer) {
-     console.error('No se encontró el contenedor de películas favoritas.')
-     return;
+    console.error('No se encontró el contenedor de películas favoritas.')
+    return;
   }
 
- movieContainer.innerHTML = ''; // Limpiar contenido previo
+  movieContainer.innerHTML = ''; // Limpiar contenido previo
 
- if (MoviesArray.length === 0) {
+  if (MoviesArray.length === 0) {
     return;
- };
+  };
 
- MoviesArray.forEach(movie => {
-     const movieCard = document.createElement('div');
-     movieCard.classList.add('movie-card');
-     movieCard.style.position = 'relative';
+  MoviesArray.forEach(movie => {
+    const movieCard = document.createElement('div');
+    movieCard.classList.add('movie-card');
+    movieCard.style.position = 'relative';
 
     const imgContainer = document.createElement('div');
     imgContainer.style.position = 'relative';
@@ -1717,7 +1785,7 @@ const getLikedMovies = () => {
     heartIcon.style.color = 'red';
     heartIcon.style.opacity = '1';
 
-    heartIcon.addEventListener('click', e  => {
+    heartIcon.addEventListener('click', e => {
       e.stopPropagation();
       removeLikedMovie(movie.id);
       getLikedMovies();
@@ -1728,7 +1796,7 @@ const getLikedMovies = () => {
 
     const title = document.createElement('h5');
     title.textContent = movie.title;
-    
+
     movieCard.appendChild(imgContainer);
     movieCard.appendChild(title);
 
@@ -1746,6 +1814,8 @@ const getLikedMovies = () => {
 window.addEventListener('storage', () => {
   getLikedMovies(); // vuelve a cargar las películas favoritas inmediatamente
 });
+
+
 // Traducciones para los títulos
 const traducciones = {
   es: {
@@ -1753,30 +1823,215 @@ const traducciones = {
     populares: 'Películas Populares',
     proximamente: 'Películas Próximamente',
     categorias: 'Categorías:',
-    recomendadas: 'Películas Recomendadas'
+    recomendadas: 'Películas Recomendadas',
+    hero_text: 'Prepárate para una aventura increíble',
   },
   en: {
     tendencias: 'Trending Movies',
     populares: 'Popular Movies',
     proximamente: 'Upcoming Movies',
     categorias: 'Categories:',
-    recomendadas: 'Recommended Movies'
+    recomendadas: 'Recommended Movies',
+    hero_text: 'Get ready for an incredible adventure',
   },
   pl: {
     tendencias: 'Filmy na czasie',
     populares: 'Popularne filmy',
     proximamente: 'Nadchodzące filmy',
     categorias: 'Kategorie:',
-    recomendadas: 'Polecane filmy'
+    recomendadas: 'Polecane filmy',
+    hero_text: 'Przygotuj się na niesamowitą przygodę',
   },
   fr: {
     tendencias: 'Films Tendance',
     populares: 'Films Populaires',
     proximamente: 'Films à Venir',
     categorias: 'Catégories :',
-    recomendadas: 'Films Recommandés'
+    recomendadas: 'Films Recommandés',
+    hero_text: 'Prépare-toi pour une aventure incroyable  ',
   }
 };
+
+const traduccionesNavbar = {
+  es: {
+    inicio: 'Inicio',
+    tendencias: 'Tendencias',
+    categorias: 'Categorías',
+    populares: 'Populares',
+    proximamente: 'Próximamente'
+  },
+
+  en: {
+    inicio: 'Home',
+    tendencias: 'Trending',
+    categorias: 'Categories',
+    populares: 'Popular',
+    proximamente: 'Upcoming'
+  },
+
+  pl: {
+    inicio: 'Strona główna',
+    tendencias: 'Na czasie',
+    categorias: 'Kategorie',
+    populares: 'Popularne',
+    proximamente: 'Wkrótce'
+  },
+
+  fr: {
+    inicio: 'Accueil',
+    tendencias: 'Tendances',
+    categorias: 'Catégories',
+    populares: 'Populaires',
+    proximamente: 'Bientôt'
+  }
+};
+
+
+const traduccionesFooter = {
+  es: {
+    derechos: '© 2025 Kino Live Start. Todos los derechos reservados.',
+    privacidad: 'Política de privacidad',
+    reglamento: 'Reglamento',
+    contacto: 'Contacto'
+  },
+
+  en: {
+    derechos: '© 2025 Kino Live Start. All rights reserved.',
+    privacidad: 'Privacy Policy',
+    reglamento: 'Regulations',
+    contacto: 'Contact'
+  },
+
+  pl: {
+    derechos: '© 2025 Kino Live Start. Wszelkie prawa zastrzeżone.',
+    privacidad: 'Polityka prywatności',
+    reglamento: 'Regulamin',
+    contacto: 'Konatkt'
+  },
+
+  fr: {
+    derechos: '© 2025 Kino Live Start. Tous droits réservés.',
+    privacidad: 'Politique de confidentialité',
+    reglamento: 'Réglment',
+    contacto: 'Contact'
+  }
+};
+
+const cambiarIdiomaFooter = (idioma) => {
+  const textos = traduccionesFooter[idioma];
+  if (!textos) return;
+
+  const footerTexto = document.querySelector('footer p');
+  const footerLinks = document.querySelectorAll('footer ul.list-inline li a');
+  
+  if (footerTexto) footerTexto.textContent = textos.derechos;
+  if (footerLinks.length >= 3) {
+    footerLinks[0].textContent = textos.privacidad;
+    footerLinks[1].textContent = textos.reglamneto;
+    footerLinks[2].textContent = textos.contacto;
+  }
+}
+
+
+const cambiarIdiomaNavbar = (idioma) => {
+  const t = traduccionesNavbar[idioma];
+  if (!t) return;
+
+  const inicio = document.querySelector('a.nav-link[href="#home"]');
+  const tendencias = document.querySelector('a.nav-link[href="#tendencias"]');
+  const categorias = document.querySelector('.nav-item.dropdown > a.nav-link.dropdown-toggle');
+  const populares = document.querySelector('a.nav-link[href="#populares"]');
+  const proximamente = document.querySelector('a.nav-link[href="#proximamente"]');
+
+  if (inicio) inicio.textContent = t.inicio;
+  if (tendencias) tendencias.textContent = t.tendencias;
+  if (categorias) categorias.textContent = t.categorias;
+  if (populares) populares.textContent = t.populares;
+  if (proximamente) proximamente.textContent = t.proximamente;
+};
+
+const traduccionesBotones = {
+
+  es: {
+     verMas: 'Ver más',
+     volver: 'Volver'
+  },
+  en: {
+    verMas: 'Show more',
+    volver: 'Back',
+  },
+  pl: {
+     verMas: 'Zabackz więej',
+     volver: 'Wróc',
+  },
+  fr: {
+    verMas: 'Voir plus',
+    volver: 'Retour'
+  }
+};
+
+const cambiarIdiomaBotones = (idioma) => {
+  const t = traduccionesBotones[idioma];
+  if (!t) return;
+
+  // Botónes de verMas
+  document.querySelectorAll('.btn.btn-polish-red').forEach(btn => {
+    btn.textContent = t.verMas;
+  })
+
+  // Botónes de volver
+  document.querySelectorAll('.btn.btn-polish-white').forEach(btn => {
+    btn.textContent = t.volver;
+  })
+ 
+ };
+
+const traduccionesBotenesbar = {
+
+  es: {
+    Ver_ahora: 'Ver ahora',
+    Detalles: 'Detalles',
+    Modo_oscuro: 'Modo oscuro',
+    Buscar_placeholder: 'Buscar..',
+  },
+
+  en: {
+    Ver_ahora: 'Watch now',
+    Detalles:  'Details',
+    Modo_oscuro: 'Dark mode',
+    Buscar_placeholder: 'Search..',
+  },
+
+  pl: {
+   Ver_ahora: 'Objrzyj teraz',
+   Detalles: 'Szegóły',
+   Modo_oscuro: 'Tyb ciemy',
+   Buscar_placeholder: 'Szukaj..',
+  },
+
+  fr: {
+    Ver_ahora: 'Regarder maintenant',
+    Detalles: 'Détails',
+    Modo_oscuro: 'Mode sombre',
+    Buscar_placeholder: 'Chercher..',
+  }
+  };
+
+  const cambiarIdiomaBotonesbaner = (idioma) => {
+    const textos = traduccionesBotenesbar[idioma];
+    if (!textos) return;
+
+    const btnVerAhora = document.querySelector('.btn.btn-danger.btn-sm');
+    const btnDetalles = document.querySelector('.btn.btn-light.btn-sm');
+    const labelModoOscuro = document.querySelector('label[for="themeSwitch"]');
+    const inputBuscar = document.getElementById('search-input');
+  
+    if (btnVerAhora) btnVerAhora.textContent = textos.Ver_ahora;
+    if (btnDetalles)  btnDetalles.textContent = textos.Detalles;
+    if (labelModoOscuro) labelModoOscuro.textContent = textos.Modo_oscuro;
+    if (inputBuscar) inputBuscar.placeholder = textos.Buscar_placeholder;
+  };
+
 
 // Cambiar los textos visibles en el DOM según idioma
 function cambiarIdiomaTextos(idioma) {
@@ -1786,22 +2041,81 @@ function cambiarIdiomaTextos(idioma) {
     return;
   }
 
+
   const tend = document.querySelector('.grid-tendencias-title');
   const pop = document.querySelector('.grid-populares-title');
   const prox = document.querySelector('.grid-proximamente-title');
+
 
   if (tend) tend.textContent = textos.tendencias;
   if (pop) pop.textContent = textos.populares;
   if (prox) prox.textContent = textos.proximamente;
 
-  // Si ya estás en la vista de detalles, actualiza textos internos
+  // Actualizar textos en vista detalle (si están presentes)
   const categoriasTitulo = document.querySelector('#movie-categories h4');
   const recomendadasTitulo = document.querySelector('#movie-similares h4');
   if (categoriasTitulo) categoriasTitulo.textContent = textos.categorias;
   if (recomendadasTitulo) recomendadasTitulo.textContent = textos.recomendadas;
+
+  // Texto hero
+  const hero_text = document.querySelector('.hero-text');
+  if (hero_text) {
+    hero_text.textContent = textos.hero_text;
+  } else {
+    console.warn('No se encontró el elemento .hero-text para actualizar');
+  }
 }
 
-// Variables y elementos para manejar el cambio de idioma
+// Traducciones para el slider
+const traduccionesSlider = {
+  es: {
+    tendencias: 'Tendencias',
+    peliculas_favoritas: 'Películas favoritas',
+    populares: 'Populares',
+    proximamente: 'Próximamente'
+  },
+  en: {
+    tendencias: 'Trending',
+    peliculas_favoritas: 'Favorite movies',
+    populares: 'Popular',
+    proximamente: 'Upcoming'
+  },
+  pl: {
+    tendencias: 'Tendencje',
+    peliculas_favoritas: 'Ulubione filmy',
+    populares: 'Popularne',
+    proximamente: 'Wkrótce'
+  },
+  fr: {
+    tendencias: 'Tendances',
+    peliculas_favoritas: 'Films favoris',
+    populares: 'Populaires',
+    proximamente: 'Bientôt'
+  }
+};
+
+function cambiarIdiomaTextoSlider(idioma) {
+  const textoSlider = traduccionesSlider[idioma];
+  if (!textoSlider) {
+    console.warn(`Idioma no soportado: ${idioma}`);
+    return;
+  }
+
+
+  const tendSlider = document.querySelector('.slider-title-tendencias');
+  const popSlider = document.querySelector('.slider-title-populares');
+  const proxSlider = document.querySelector('.slider-title-proximamente');
+  const favSlider = document.querySelector('.slider-title-peliculas-favoritas'); // Verifica que esta clase esté correcta en tu HTML
+
+
+
+  if (tendSlider) tendSlider.textContent = textoSlider.tendencias;
+  if (popSlider) popSlider.textContent = textoSlider.populares;
+  if (proxSlider) proxSlider.textContent = textoSlider.proximamente;
+  if (favSlider) favSlider.textContent = textoSlider.peliculas_favoritas;
+}
+
+// Variables para manejar cambio de idioma
 const languageSwitch = document.getElementById('languageSwitch');
 const langLabels = ['es', 'en', 'pl', 'fr'];  // Códigos de idiomas
 let currentIndex = 0;
@@ -1836,15 +2150,36 @@ function actualizarPeliculas() {
   localStorage.setItem('idioma', idioma);
 
   cambiarIdiomaTextos(idioma);
+  cambiarIdiomaTextoSlider(idioma);
+  cambiarIdiomaNavbar(idioma);
+  cambiarIdiomaFooter(idioma);
+  cambiarIdiomaBotones(idioma) 
+ bannerDinamicoTMDb(idioma);
+ cambiarIdiomaBotonesbaner(idioma);
+
+
+
+
+
+
+
   getTredingMovies(idioma);
   getMoviesProximmamente(idioma);
   getPopularMovies(idioma);
   getCategoriesPreview(idioma);
+  generarGridMoviesTendencias(idioma);
+  generarGridMoviesPopulares(idioma);
+  generarGridMoviesProximamente(idioma);
+  getMoviesCategory(idioma)
+
+
+
+
 
   // Si estás en vista de detalle, recargar la película actual
   const visible = !movieDetailSection.classList.contains('d-none');
   if (visible && currentMovieId) {
-    getMovieDetailsById(currentMovieId); // Recarga con idioma nuevo
+    getMovieDetailsById(currentMovieId);
   }
 }
 
@@ -1858,3 +2193,57 @@ languageSwitch.addEventListener('click', () => {
 // Al iniciar la página, actualizar labels y cargar películas
 updateLabel();
 actualizarPeliculas();
+
+
+
+
+async function bannerDinamicoTMDb(bannerSelector, intervalMs = 15000) {
+  const bannerSection = document.querySelector('#banner');
+  const heroContainer = bannerSection.querySelector('.hero-container');
+  if (!heroContainer) {
+    console.error('No se encontró .hero-container');
+    return;
+  }
+  const p = heroContainer.querySelector('p');
+  // No obtenemos ni manipulamos los botones
+  // const btnWatch = heroContainer.querySelector('.btn-danger');
+  // const btnDetails = heroContainer.querySelector('.btn-light');
+
+ 
+  const idioma = localStorage.getItem('idioma') || 'es';
+
+  try {
+    const resMovies = await api('trending/movie/week', { params: { language: idioma } });
+    const movies = resMovies.data.results;
+    if (!movies.length) {
+      p.textContent = 'No se encontraron películas trending.';
+      return;
+    }
+
+    bannerSection.classList.remove('skeleton');
+    heroContainer.classList.remove('d-none');
+
+    let i = 0;
+
+    async function mostrar() {
+      const movie = movies[i];
+
+      // Cambiar imagen de fondo
+      bannerSection.style.backgroundImage = `url(https://image.tmdb.org/t/p/original${movie.backdrop_path || movie.poster_path})`;
+
+      // Solo mostramos la descripción (sin trailers ni botones)
+      p.textContent = movie.overview || "No hay descripción disponible";
+
+      i = (i + 1) % movies.length;
+    }
+
+    await mostrar();
+    setInterval(mostrar, intervalMs);
+
+  } catch (error) {
+    console.error('Error al obtener películas trending:', error);
+    p.textContent = 'Error al cargar películas trending.';
+  }
+}
+
+bannerDinamicoTMDb();
