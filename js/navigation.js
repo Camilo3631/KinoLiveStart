@@ -1,5 +1,4 @@
-let onScroll;
-
+//let onScroll;
 
 searchButton.addEventListener('click', () => {
   location.hash = `#search=${searchInput.value}`;
@@ -90,11 +89,11 @@ const homePage = () => {
 
 
   // Invocamos las funciones
-  getCategoriesPreview();
+   getCategoriesPreview(); 
   getTredingMovies();
-  generarGridMoviesTendencias();
-  generarGridMoviesPopulares();
-  generarGridMoviesProximamente();
+// generarGridMoviesTendencias();
+  //  generarGridMoviesPopulares();
+//  generarGridMoviesProximamente();
   getLikedMovies();
 
 
@@ -113,14 +112,14 @@ const categoriesPage = () => {
   getTredingMovies();
   getCategoriesPreview()
  
-  // ['#category', 'id-name']
+  ['#category', 'id-name']
   const [_, categoryData] = location.hash.split('=');
   const [categoryId, categoryName] = categoryData.split('-');
 
-  categoryTitle.innerHTML = categoryName;
-
- getMoviesCategory(categoryId)
-  onScroll =  getPaginatedMoviesByCategory(categoryId)
+  categoryTitle.innerHTML = categoryName; 
+  
+ getMoviesCategory();
+ onScroll =  getPaginatedMoviesByCategory(categoryId);
 
 }
 
@@ -298,7 +297,7 @@ const categoriesPage = () => {
     };
 
 
-    onScroll = getPaginatedMoviesByCategory(id);
+   /// onScroll = getPaginatedMoviesByCategory(id);
 
   };
 
@@ -327,7 +326,7 @@ const categoriesPage = () => {
     const [_, query] = location.hash.split('=');
     getMoviesSearch(query);
 
-    onScroll = getPaginatedMoviesBySearch(query);
+  onScroll = getPaginatedMoviesBySearch(query);
 
 
 
@@ -343,7 +342,7 @@ const categoriesPage = () => {
     proximamenteSection.classList.add('d-none');
     popularesSection.classList.add('d-none');
     getTredingMovies();
-    generarGridMoviesTendencias();
+  //  generarGridMoviesTendencias();
     getCategoriesPreview();
 
 
