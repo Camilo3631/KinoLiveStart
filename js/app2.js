@@ -1,15 +1,4 @@
-// Creamos una instancia de axios
-const api = axios.create({
-  // Base URL
-  baseURL: 'https://api.themoviedb.org/3/',
-  // api_key como parámetro
-  params: {
-    'api_key': '030eada77e494e280d243a5356401f1a',
-  },
-  headers: {
-    'Content-Type': 'application/json; charset=utf-8'
-  },
-})
+
 
 
 
@@ -1342,7 +1331,7 @@ let peliculasMostradasTendencias = [];
 let paginaActualTendencias = 2; // Empieza en la 2 porque la 1 ya está cargada
 const maxPaginasTendencias = 6;  // Hasta 6 páginas
 let cargandoPeliculasTendencias = false;
-let idiomaSeleccionado = 'es'; // se pierde al recargar la página
+
 
 
 let totalPeliculasMostradasTendecias = 0;
